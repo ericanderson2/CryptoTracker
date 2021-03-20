@@ -1,6 +1,7 @@
 var coinDict = {};
 
 setInterval(getSimplePrice, 1000, "bitcoin")
+setInterval(getHistorical, 1000, "yearn-finance")
 
 function getCoins()
 {
@@ -50,7 +51,24 @@ function getSimplePrice(coin)
           var coinPrice = JSON.parse(this.responseText);
           console.log(coinPrice[coin]["usd"]);
           console.log(coinPrice[coin]["last_updated_at"])
-          document.getElementById(coin).innerHTML = coinPrice[coin]["usd"];
+          document.getElementById(coin).innerHTML = coinPrice[coin]["usd"].toFixed(2);
+      }
+  };
+  xmlhttp.open("GET", coinURL, true);
+  xmlhttp.send();
+}
+
+function getHistorical(coin, numDays)
+{
+  const coinURL = 'https://api.coingecko.com/api/v3/coins/' + coin + '/market_chart?vs_currency=usd&days=' + numDays;
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.onreadystatechange = function()
+  {
+      if (this.readyState == 4 && this.status == 200)
+      {
+          var priceOverTime = JSON.parse(this.responseText);
+          console.log(priceOverTime["prices"][0])
+          document.getElementById(coin).innerHTML = priceOverTime['prices'][0][1].toFixed(2);
       }
   };
   xmlhttp.open("GET", coinURL, true);
