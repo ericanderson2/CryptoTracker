@@ -1,15 +1,28 @@
 * {
   margin: 0;
   padding: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+:root {
+--primary-color: #a8dadc;
+--secondary-color: #1d3557;
+/*--tertiary-color: #457b9d;*/
+--tertiary-color: #BA9790;
+--background-color: #f1faee;
 }
 
 div.main {
   display: flex;
-  margin-top: 100px;
+  background-color: var(--background-color);
+}
+
+div.main-panel {
+  padding-top: 100px;
 }
 
 div.coin-box {
-  border: 5px solid green;
+  border: 5px solid var(--secondary-color);
   border-radius: 25px;
   width: 26%;
   min-width: 300px;
@@ -19,6 +32,8 @@ div.coin-box {
   flex-grow: 1;
   margin: 10px;
   padding: 10px;
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
 }
 
 div.coins-container {
@@ -29,35 +44,48 @@ div.coins-container {
 }
 
 div.sidebar {
-  border: 5px solid black;
+  border-left: 5px solid var(--secondary-color);
   flex: 1 1 20%;
   min-width: 25ch;
-  padding-left: 20px;
-  background-color: #ccc;
+  padding-left: 30px;
+  padding-top: 100px;
+  margin-left: 20px;
+  background-color: var(--tertiary-color);
+  font-size: 20px;
+  color: var(--secondary-color);
+}
+
+div.sidebar h2 {
+  margin-bottom: 10px;
+}
+
+div.sidebar li {
+  margin-left: 30px;
 }
 
 div.header {
   position: fixed;
   top: 0px;
-  background-color: #333;
+  background-color: var(--secondary-color);
   width: 100%;
 
 }
 
 div.header h1 {
-  color: #eee;
+  color: var(--primary-color);
   text-align: center;
   margin: 20px;
 }
 
 div.panel-control button {
-  background-color: white;
+  background-color: var(--background-color);
   border: none;
-  color: black;
+  color: var(--secondary-color);
   font-size: 32px;
   margin-left: 25px;
+  font-weight: bold;
 }
 
 div.panel-control button:hover {
-  color: gray;
+  color: var(--tertiary-color);
 }
