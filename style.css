@@ -1,0 +1,23 @@
+div.main {
+  display: flex;
+}
+
+div.coin-box {
+  border: 5px solid green;
+  border-radius: 25px;
+  margin: 1%;
+  padding: 1%;
+}
+
+div.coins-container {
+  display: grid;
+  margin: 0px;
+  width: 80%;
+  grid-template-columns: 33% 33% 33%;
+}
+
+div.sidebar {
+  border: 5px solid black;
+  width: 20%;
+  padding: 20px;
+}
