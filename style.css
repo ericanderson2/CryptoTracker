@@ -89,3 +89,10 @@ div.panel-control button {
 div.panel-control button:hover {
   color: var(--tertiary-color);
 }
+
+img.coinIMG
+{
+  float: left;
+  padding-right: 2%;
+
+}

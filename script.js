@@ -1,7 +1,7 @@
 
 
 //All coin IDS and their box IDS on the homepage
-var homeCoins = {'bitcoin': 1, 'aapl': 2, 'aave': 3, '88mph': 4, 'ethereum': 5, 'mooncoin': 6, 'dogecoin': 7, 'dogz': 8, 'koto': 9, 'kompass': 10};
+var homeCoins = {'bitcoin': 1, 'litecoin': 2, 'aave': 3, '88mph': 4, 'ethereum': 5, 'mooncoin': 6, 'dogecoin': 7, 'dogz': 8, 'cardano': 9, 'kompass': 10};
 
 /*
     Gets all coins currenly being tracked by CoinGecko and outputs them in a dictionary.
@@ -42,7 +42,6 @@ function getCoins()
 */
 const setHomeCoin = (coin, box_id) =>
 {
-    console.log(coin);
     //Get todays date. We need this b/c we're using the 'historical' API function and getting the current price. Kinda hacky but it gives us more precision
     var today = new Date();
     var dd = String(today.getDate()).padStart(2, '0');
@@ -52,17 +51,22 @@ const setHomeCoin = (coin, box_id) =>
     //Parse the date objects into a string
     today = dd + '-' + mm + '-' + yyyy;
     const coinURL = 'https://api.coingecko.com/api/v3/coins/' + coin + '/history?date=' + today + '&localization=false';
+    
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function()
     {
         if (xmlhttp.readyState == 4 && xmlhttp.status == 200)
         {
-
-            coinPrice = JSON.parse(xmlhttp.responseText)['market_data']['current_price']['usd'];
-
+            coinName = coin.charAt(0).toUpperCase() + coin.slice(1);
+            coinJSON = JSON.parse(xmlhttp.responseText);
+            coinPrice = coinJSON['market_data']['current_price']['usd'];
+            coinIMG = coinJSON['image']['thumb'];
+            coinTicker = coinJSON['symbol'];
+            
             //Update doc to display price
             document.getElementById('box' + box_id).innerHTML = coinPrice;
-            document.getElementById('head' + box_id).innerHTML = coin;
+            document.getElementById('img' + box_id).src = coinIMG;
+            document.getElementById('head' + box_id).innerHTML = coinName + ' (' + coinTicker + ')';
         }
     };
     xmlhttp.open("GET", coinURL, true);
@@ -82,8 +86,8 @@ function initCoins()
         //Display data for every coin and set an interval for them
         setHomeCoin(key, homeCoins[key]);
         makeChart(key, homeCoins[key], 15);
-        setInterval(makeChart, 1000, homeCoins[key], key);
-        setInterval(setHomeCoin, 1000, key, homeCoins[key]);
+        setInterval(makeChart, 100000, homeCoins[key], key);
+        setInterval(setHomeCoin, 100000, key, homeCoins[key]);
     }
 }
 
