@@ -81,6 +81,8 @@ function initCoins()
     {
         //Display data for every coin and set an interval for them
         setHomeCoin(key, homeCoins[key]);
+        makeChart(key, homeCoins[key], 15);
+        setInterval(makeChart, 1000, homeCoins[key], key);
         setInterval(setHomeCoin, 1000, key, homeCoins[key]);
     }
 }
@@ -105,19 +107,50 @@ function getSimplePrice(coin)
   xmlhttp.send();
 }
 
-function getHistorical(coin, numDays)
+const makeChart = (coin, box_id, numDays) =>
 {
-  const coinURL = 'https://api.coingecko.com/api/v3/coins/' + coin + '/market_chart?vs_currency=usd&days=' + numDays;
-  var xmlhttp = new XMLHttpRequest();
-  xmlhttp.onreadystatechange = function()
-  {
-      if (this.readyState == 4 && this.status == 200)
-      {
-          var priceOverTime = JSON.parse(this.responseText);
-          //console.log(priceOverTime["prices"][0])
-          document.getElementById('box1').innerHTML = priceOverTime['prices'][0][1].toFixed(2);
-      }
-  };
-  xmlhttp.open("GET", coinURL, true);
-  xmlhttp.send();
+    const coinURL = 'https://api.coingecko.com/api/v3/coins/' + coin + '/market_chart?vs_currency=usd&days=' + numDays;
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function()
+    {
+        if (this.readyState == 4 && this.status == 200)
+        {
+            var priceOverTime = JSON.parse(this.responseText);
+            chart(priceOverTime['prices'], box_id);
+        }
+     };
+    xmlhttp.open("GET", coinURL, true);
+    xmlhttp.send();
+}
+
+const chart = (data, box_id) =>
+{
+    if (data == null) return;
+    
+    var labels = [];    // grab dates or just say over the past x days (might be cleaner)
+    var mc = [];            // add points for mc /
+    var price = [];         
+    for (var i = 0; i < data.length; i++){
+        mc[i] = data[i][0];
+        price[i] = data[i][1];
+    }
+    new Chart(document.getElementById("chart" + box_id), {
+        type: 'line',
+        data: {
+        //   labels: labels,
+            datasets: [{ 
+                data: price,
+                label: "price",
+                borderColor: "#3e95cd",
+                fill: false
+            }, { 
+                data: mc,
+                label: "marketcap",
+                borderColor: "#8e5ea2",
+                fill: false,
+                hidden: true
+            }
+            ]
+        }
+    });
 }
