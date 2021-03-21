@@ -5,11 +5,11 @@
 }
 
 :root {
---primary-color: #a8dadc;
---secondary-color: #1d3557;
+--primary-color: #282828;
+--secondary-color: #9E9E9E;
 /*--tertiary-color: #457b9d;*/
---tertiary-color: #BA9790;
---background-color: #f1faee;
+--tertiary-color: #282828;
+--background-color: #191919;;
 }
 
 div.main {
@@ -18,7 +18,7 @@ div.main {
 }
 
 div.main-panel {
-  padding-top: 100px;
+  padding-top: 2%;
 }
 
 div.coin-box {
@@ -63,32 +63,56 @@ div.sidebar li {
   margin-left: 30px;
 }
 
-div.header {
-  position: fixed;
-  top: 0px;
-  background-color: var(--secondary-color);
-  width: 100%;
-
+ul.header {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: var(--primary-color);
+  position: -webkit-sticky; /* Safari */
+  position: sticky;
+  top: 0;
+  border-bottom: 5px solid var(--secondary-color);
 }
 
-div.header h1 {
-  color: var(--primary-color);
-  text-align: center;
+ul.header li
+{
+  float: left;
+}
+
+ul.header a {
+  color: var(--secondary-color);
   margin: 20px;
+  color: #9E9E9E;
+	font-family: arial, sans-serif;
+	font-size: 32px;
+  display: block;
+  text-align: center;
+  padding-left: 14px;
+  text-decoration: none;
 }
 
-div.panel-control button {
+ul.header li:hover 
+{
+    background-color: #111;
+}
+
+div.panel-control
+{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+div.panel-control h1 {
   background-color: var(--background-color);
   border: none;
   color: var(--secondary-color);
   font-size: 32px;
-  margin-left: 25px;
   font-weight: bold;
+  padding-bottom: 3%;
 }
 
-div.panel-control button:hover {
-  color: var(--tertiary-color);
-}
 
 img.coinIMG
 {

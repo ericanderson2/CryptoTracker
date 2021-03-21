@@ -43,15 +43,16 @@ function getCoins()
 const setHomeCoin = (coin, box_id) =>
 {
     //Get todays date. We need this b/c we're using the 'historical' API function and getting the current price. Kinda hacky but it gives us more precision
-    var today = new Date();
-    var dd = String(today.getDate()).padStart(2, '0');
-    var mm = String(today.getMonth() + 1).padStart(2, '0'); //Months are indexed at 0
-    var yyyy = today.getFullYear();
+    //var today = new Date();
+    //var dd = String(today.getDate()).padStart(2, '0');
+    //var mm = String(today.getMonth() + 1).padStart(2, '0'); //Months are indexed at 0
+    //var yyyy = today.getFullYear();
 
     //Parse the date objects into a string
-    today = dd + '-' + mm + '-' + yyyy;
-    const coinURL = 'https://api.coingecko.com/api/v3/coins/' + coin + '/history?date=' + today + '&localization=false';
-    
+    //today = dd + '-' + mm + '-' + yyyy;
+    //const coinURL = 'https://api.coingecko.com/api/v3/coins/' + coin + '/history?date=' + today + '&localization=false';
+    const coinURL = 'https://api.coingecko.com/api/v3/coins/' + coin + '?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false';
+
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function()
     {
@@ -61,10 +62,21 @@ const setHomeCoin = (coin, box_id) =>
             coinJSON = JSON.parse(xmlhttp.responseText);
             coinPrice = coinJSON['market_data']['current_price']['usd'];
             coinIMG = coinJSON['image']['thumb'];
-            coinTicker = coinJSON['symbol'];
+            coinTicker = coinJSON['symbol'].toUpperCase();
+            coinStatus = coinJSON['market_data']['price_change_percentage_24h'].toFixed(2);
             
             //Update doc to display price
             document.getElementById('box' + box_id).innerHTML = coinPrice;
+            if(coinStatus.charAt(0) == '-')
+            {
+                document.getElementById('change' + box_id).style.color = 'red';
+                document.getElementById('change' + box_id).innerHTML = coinStatus + '%';
+            }
+            else
+            {
+                document.getElementById('change' + box_id).style.color = 'green';
+                document.getElementById('change' + box_id).innerHTML = '+' + coinStatus + '%';
+            }
             document.getElementById('img' + box_id).src = coinIMG;
             document.getElementById('head' + box_id).innerHTML = coinName + ' (' + coinTicker + ')';
         }
