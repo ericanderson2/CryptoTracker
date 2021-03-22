@@ -146,17 +146,16 @@ const makeChart = (coin, box_id, color) =>
 */
 const chart = (prices, mcs, box_id, color) =>
 {
-    var coinMC = [];
-    var coinPrice = [];
-    for (var i = 0; i < prices.length; i++){
+    var coinMC = [], coinPrice = [], labels = [];
+    for (var i = 0; i < mcs.length; i++){ 
         coinMC[i] = mcs[i][1];
         coinPrice[i] = prices[i][1];
+        if (i < 125) labels[i] = '';
     }
     new Chart(document.getElementById("chart" + box_id), {
         type: 'line',
         data: {
-          labels: ["","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",
-                    "","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",""],
+          labels: labels,
             datasets: [{ 
                 data: coinPrice,
                 label: "price",
@@ -168,7 +167,7 @@ const chart = (prices, mcs, box_id, color) =>
                 label: "market cap",
                 borderColor: color,
                 pointBorderColor: 'none',
-                fill: true,
+                fill: false,
                 hidden: true
             }
             ]
