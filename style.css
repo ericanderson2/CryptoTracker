@@ -7,14 +7,17 @@
 :root {
 --primary-color: #282828;
 --secondary-color: #9E9E9E;
-/*--tertiary-color: #457b9d;*/
+/* --tertiary-color: #457b9d; */
 --tertiary-color: #282828;
---background-color: #191919;;
+--background-color1: rgb(65,65,65);
+--background-color2: linear-gradient(0deg, rgba(65,65,65,1) 0%, rgba(0,0,0,0.9262079831932774) 100%);
+/* radial-gradient(circle, rgba(54,91,94,1) 0%, rgba(0,0,0,1) 100%); */
 }
 
 div.main {
   display: flex;
-  background-color: var(--background-color);
+  background-color: var(--background-color1);
+  background: var(--background-color2); 
 }
 
 div.main-panel {
@@ -22,7 +25,7 @@ div.main-panel {
 }
 
 div.coin-box {
-  border: 5px solid var(--secondary-color);
+  border: 1px solid var(--secondary-color);
   border-radius: 25px;
   width: 26%;
   min-width: 300px;
@@ -32,8 +35,9 @@ div.coin-box {
   flex-grow: 1;
   margin: 10px;
   padding: 10px;
-  background-color: var(--primary-color);
+  /* background-color: var(--primary-color); */
   color: var(--secondary-color);
+
 }
 
 div.coins-container {
@@ -44,9 +48,9 @@ div.coins-container {
 }
 
 div.sidebar {
-  border-left: 5px solid var(--secondary-color);
+  border-left: 1px solid var(--secondary-color);
   flex: 1 1 20%;
-  min-width: 25ch;
+  min-width: 5ch;
   padding-left: 30px;
   padding-top: 100px;
   margin-left: 20px;
@@ -72,7 +76,7 @@ ul.header {
   position: -webkit-sticky; /* Safari */
   position: sticky;
   top: 0;
-  border-bottom: 5px solid var(--secondary-color);
+  border-bottom: 1px solid var(--secondary-color);
 }
 
 ul.header li
@@ -85,7 +89,7 @@ ul.header a {
   margin: 20px;
   color: #9E9E9E;
 	font-family: arial, sans-serif;
-	font-size: 32px;
+	font-size: 20px;
   display: block;
   text-align: center;
   padding-left: 14px;
@@ -120,3 +124,47 @@ img.coinIMG
   padding-right: 2%;
 
 }
+
+/* stuff for dropdown menu */
+
+/* Dropdown Button */
+.dropbtn {
+  background-color: var(--background-color1);
+  color:  var(--secondary-color);
+  padding: 30px;
+  padding-top: 20px;
+  font-size: 20px;
+  border: none;
+  cursor: pointer;
+}
+
+/* Dropdown button on hover & focus */
+.dropbtn:hover, .dropbtn:focus {
+  background-color: #f1f1f1;
+}
+
+/* The container <div> - needed to position the dropdown content */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f1f1f1;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+  color: black;
+  padding: 0px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {background-color: --secondary-color}
+.show {display:block;}
