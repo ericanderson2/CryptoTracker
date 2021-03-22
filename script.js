@@ -1,7 +1,7 @@
 
 
 //All coin IDS and their box IDS on the homepage
-var homeCoins = {'bitcoin': 1, 'litecoin': 2, 'aave': 3, '88mph': 4, 'ethereum': 5, 'mooncoin': 6, 'dogecoin': 7, 'dogz': 8, 'cardano': 9, 'kompass': 10};
+var homeCoins = {'bitcoin': 1, 'litecoin': 2, 'aave': 3, '88mph': 4, 'ethereum': 5, 'mooncoin': 6, 'dogecoin': 7, '1inch': 8, 'cardano': 9, 'kompass': 10};
 
 /*
     Gets all coins currenly being tracked by CoinGecko and outputs them in a dictionary.
@@ -52,7 +52,6 @@ const setHomeCoin = (coin, box_id) =>
     //today = dd + '-' + mm + '-' + yyyy;
     //const coinURL = 'https://api.coingecko.com/api/v3/coins/' + coin + '/history?date=' + today + '&localization=false';
     const coinURL = 'https://api.coingecko.com/api/v3/coins/' + coin + '?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false';
-
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function()
     {
@@ -71,11 +70,13 @@ const setHomeCoin = (coin, box_id) =>
             {
                 document.getElementById('change' + box_id).style.color = 'red';
                 document.getElementById('change' + box_id).innerHTML = coinStatus + '%';
+                makeChart(coin, box_id, 'red');
             }
             else
             {
                 document.getElementById('change' + box_id).style.color = 'green';
                 document.getElementById('change' + box_id).innerHTML = '+' + coinStatus + '%';
+                makeChart(coin, box_id, 'green');
             }
             document.getElementById('img' + box_id).src = coinIMG;
             document.getElementById('head' + box_id).innerHTML = coinName + ' (' + coinTicker + ')';
@@ -97,8 +98,6 @@ function initCoins()
     {
         //Display data for every coin and set an interval for them
         setHomeCoin(key, homeCoins[key]);
-        makeChart(key, homeCoins[key], 15);
-        setInterval(makeChart, 100000, homeCoins[key], key);
         setInterval(setHomeCoin, 100000, key, homeCoins[key]);
     }
 }
@@ -123,50 +122,70 @@ function getSimplePrice(coin)
   xmlhttp.send();
 }
 
-const makeChart = (coin, box_id, numDays) =>
+/*
+    gathers historical data and calls chart() to graph recent 24 vol and prices.
+*/
+const makeChart = (coin, box_id, color) =>
 {
-    const coinURL = 'https://api.coingecko.com/api/v3/coins/' + coin + '/market_chart?vs_currency=usd&days=' + numDays;
+    const coinURL = 'https://api.coingecko.com/api/v3/coins/' + 'ethereum' + '/market_chart?vs_currency=usd&days=' + 1;
+    var xmlhttp = new XMLHttpRequest();
+    var btcPrice;
+    xmlhttp.onreadystatechange = function()
+    {
+        if (this.readyState == 4 && this.status == 200)
+        {
+            btcPrice = JSON.parse(this.responseText);
+        }
+     };
+    xmlhttp.open("GET", coinURL, true);
+    xmlhttp.send();
+
+    const coinURL2 = 'https://api.coingecko.com/api/v3/coins/' + coin + '/market_chart?vs_currency=usd&days=' + 1;
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function()
     {
         if (this.readyState == 4 && this.status == 200)
         {
-            var priceOverTime = JSON.parse(this.responseText);
-            chart(priceOverTime['prices'], box_id);
+            var coinPrice = JSON.parse(this.responseText);
+            chart(coinPrice['prices'], btcPrice['prices'], box_id, color);
         }
      };
-    xmlhttp.open("GET", coinURL, true);
+    xmlhttp.open("GET", coinURL2, true);
     xmlhttp.send();
 }
 
-const chart = (data, box_id) =>
+/*
+    creates chart for a given coin.
+*/
+const chart = (prices, mcs, box_id, color) =>
 {
-    if (data == null) return;
-    
-    var labels = [];    // grab dates or just say over the past x days (might be cleaner)
-    var mc = [];            // add points for mc /
-    var price = [];         
-    for (var i = 0; i < data.length; i++){
-        mc[i] = data[i][0];
-        price[i] = data[i][1];
+    var coinMC = [];
+    var coinPrice = [];
+    for (var i = 0; i < prices.length; i++){
+        coinMC[i] = mcs[i][1];
+        coinPrice[i] = prices[i][1];
     }
     new Chart(document.getElementById("chart" + box_id), {
         type: 'line',
         data: {
-        //   labels: labels,
+          labels: ["","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",
+                    "","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",""],
             datasets: [{ 
-                data: price,
+                data: coinPrice,
                 label: "price",
-                borderColor: "#3e95cd",
+                borderColor: color,
+                pointBorderColor: 'none',
                 fill: false
             }, { 
-                data: mc,
-                label: "marketcap",
-                borderColor: "#8e5ea2",
-                fill: false,
+                data: coinMC,
+                label: "btc",
+                borderColor: 'grey',
+                pointBorderColor: 'none',
+                fill: true,
                 hidden: true
             }
             ]
+            
         }
     });
 }
