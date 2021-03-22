@@ -127,19 +127,6 @@ function getSimplePrice(coin)
 */
 const makeChart = (coin, box_id, color) =>
 {
-    const coinURL = 'https://api.coingecko.com/api/v3/coins/' + 'ethereum' + '/market_chart?vs_currency=usd&days=' + 1;
-    var xmlhttp = new XMLHttpRequest();
-    var btcPrice;
-    xmlhttp.onreadystatechange = function()
-    {
-        if (this.readyState == 4 && this.status == 200)
-        {
-            btcPrice = JSON.parse(this.responseText);
-        }
-     };
-    xmlhttp.open("GET", coinURL, true);
-    xmlhttp.send();
-
     const coinURL2 = 'https://api.coingecko.com/api/v3/coins/' + coin + '/market_chart?vs_currency=usd&days=' + 1;
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function()
@@ -147,7 +134,7 @@ const makeChart = (coin, box_id, color) =>
         if (this.readyState == 4 && this.status == 200)
         {
             var coinPrice = JSON.parse(this.responseText);
-            chart(coinPrice['prices'], btcPrice['prices'], box_id, color);
+            chart(coinPrice['prices'], coinPrice['market_caps'], box_id, color);
         }
      };
     xmlhttp.open("GET", coinURL2, true);
@@ -178,8 +165,8 @@ const chart = (prices, mcs, box_id, color) =>
                 fill: false
             }, { 
                 data: coinMC,
-                label: "btc",
-                borderColor: 'grey',
+                label: "market cap",
+                borderColor: color,
                 pointBorderColor: 'none',
                 fill: true,
                 hidden: true
