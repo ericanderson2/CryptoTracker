@@ -14,14 +14,15 @@
       <li><a id="pins" href="">My Pins</a></li>
       <li>
           <!-- could add coin list here instead of sidebar... but maybe put on right side. Just an opinion, do whatever u want. -->
-        <div class="dropdown">
-        <button onclick="myFunction()" class="dropbtn">All Coins</button>
-        <div id="myDropdown" class="dropdown-content">
-          <a href="#">Link 1</a>
-          <a href="#">Link 2</a>
-          <a href="#">Link 3</a>
-        </div>
-      </div></li>
+          <div class="dropdown">
+            <button onclick="myFunction()" class="dropbtn">All Coins</button>
+            <div id="myDropdown" class="dropdown-content">
+              <a href="#">Link 1</a>
+              <a href="#">Link 2</a>
+              <a href="#">Link 3</a>
+            </div>
+          </div>
+      </li>
       <li><a href="coin.html?id=bitcoin">Test</a></li>
     </ul>
 
@@ -30,8 +31,8 @@
     <div class="coin-box">
       <img id = img1 class = "coinIMG"/>
       <h1 id='head1'></h1>
-      <h1 id="box1"></p>
-      <h2 id="change1"></p>
+      <h1 id="box1"></h1>
+      <h2 id="change1"></h2>
       <div>
         <canvas id="chart1" width="200" height="200"></canvas>
       </div>
@@ -40,4 +41,5 @@
     </div>
 
   </body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
 </html>
