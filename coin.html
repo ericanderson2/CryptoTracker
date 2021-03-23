@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>CryptoTracker</title>
+    <link rel="stylesheet" href="style.css"></link>
+    <script type="text/javascript" src="script.js"></script>
+    <script type="text/javascript" src="view_coin.js"></script>
+  </head>
+  <body>
+
+    <ul class="header">
+      <li><a id="index" href="index.html">CryptoTracker</a></li>
+      <li><a id="pins" href="">My Pins</a></li>
+      <li>
+          <!-- could add coin list here instead of sidebar... but maybe put on right side. Just an opinion, do whatever u want. -->
+        <div class="dropdown">
+        <button onclick="myFunction()" class="dropbtn">All Coins</button>
+        <div id="myDropdown" class="dropdown-content">
+          <a href="#">Link 1</a>
+          <a href="#">Link 2</a>
+          <a href="#">Link 3</a>
+        </div>
+      </div></li>
+      <li><a href="coin.html?id=bitcoin">Test</a></li>
+    </ul>
+
+    <div class="main">
+
+    <div class="coin-box">
+      <img id = img1 class = "coinIMG"/>
+      <h1 id='head1'></h1>
+      <h1 id="box1"></p>
+      <h2 id="change1"></p>
+      <div>
+        <canvas id="chart1" width="200" height="200"></canvas>
+      </div>
+    </div>
+
+    </div>
+
+  </body>
+</html>

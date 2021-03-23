@@ -23,13 +23,13 @@ async function getCoins()
     const listURL='https://api.coingecko.com/api/v3/coins/list';
     const coinData = await coinAPICall(listURL);
     //Insert data into a dicitonary
-    for (var i = 0; i < coinData.length; i++) 
+    for (var i = 0; i < coinData.length; i++)
     {
         coinDict[coinData[i].id] = coinData[i].name
     }
     //Currently just logs the dict. Can be configured as a return value, etc.
     console.log(coinDict);
-    
+
 }
 
 /*
@@ -57,7 +57,7 @@ const setHomeCoin = async (coin, box_id) =>
     coinIMG = coinJSON['image']['thumb'];
     coinTicker = coinJSON['symbol'].toUpperCase();
     coinStatus = coinJSON['market_data']['price_change_percentage_24h'].toFixed(2);
-    
+
     //Update doc to display price
     document.getElementById('box' + box_id).innerHTML = coinPrice;
     if(coinStatus.charAt(0) == '-')
@@ -75,7 +75,7 @@ const setHomeCoin = async (coin, box_id) =>
         makeChart(coin, box_id, 'green');
     }
     document.getElementById('img' + box_id).src = coinIMG;
-    document.getElementById('head' + box_id).innerHTML = coinName + ' (' + coinTicker + ')';
+    document.getElementById('head' + box_id).innerHTML = '<a href="coin.html?id=' + coin + '">' + coinName + ' (' + coinTicker + ')' + '</a>';
 
 }
 
@@ -84,15 +84,15 @@ const setHomeCoin = async (coin, box_id) =>
 */
 function initCoins()
 {
-    //TODO: Populate dictionary with coins to showcase 
+    //TODO: Populate dictionary with coins to showcase
 
-    for (var key in homeCoins) 
+    for (var key in homeCoins)
     {
         //Display data for every coin and set an interval for them
         setHomeCoin(key, homeCoins[key]);
         setInterval(setHomeCoin, 100000, key, homeCoins[key]);
     }
-    
+
 }
 
 
@@ -101,7 +101,7 @@ async function getSimplePrice(coin)
     const coinURL = 'https://api.coingecko.com/api/v3/simple/price?ids=' + coin + '&vs_currencies=usd&include_market_cap=false&include_24hr_vol=false&include_24hr_change=false&include_last_updated_at=true';
     const coinPrice = await coinAPICall(coinURl);
     document.getElementById('box1').innerHTML = coinPrice[coin]["usd"].toFixed(2);
-    
+
 }
 
 
@@ -121,7 +121,7 @@ const makeChart = async (coin, box_id, color) =>
 const chart = (prices, mcs, box_id, color) =>
 {
     var coinMC = [], coinPrice = [], labels = [];
-    for (var i = 0; i < mcs.length; i++){ 
+    for (var i = 0; i < mcs.length; i++){
         coinMC[i] = mcs[i][1];
         coinPrice[i] = prices[i][1];
         if (i < 125) labels[i] = '';
@@ -130,13 +130,13 @@ const chart = (prices, mcs, box_id, color) =>
         type: 'line',
         data: {
           labels: labels,
-            datasets: [{ 
+            datasets: [{
                 data: coinPrice,
                 label: "price",
                 borderColor: color,
                 pointBorderColor: 'none',
                 fill: false
-            }, { 
+            }, {
                 data: coinMC,
                 label: "market cap",
                 borderColor: color,
@@ -145,7 +145,7 @@ const chart = (prices, mcs, box_id, color) =>
                 hidden: true
             }
             ]
-            
+
         }
     });
 }

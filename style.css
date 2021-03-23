@@ -17,7 +17,7 @@
 div.main {
   display: flex;
   background-color: var(--background-color1);
-  background: var(--background-color2); 
+  background: var(--background-color2);
 }
 
 div.main-panel {
@@ -96,7 +96,7 @@ ul.header a {
   text-decoration: none;
 }
 
-ul.header li:hover 
+ul.header li:hover
 {
     background-color: #111;
 }
