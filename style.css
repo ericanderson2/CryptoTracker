@@ -35,7 +35,27 @@ div.coin-box {
   flex-grow: 1;
   margin: 10px;
   padding: 10px;
+  text-align: center;
   /* background-color: var(--primary-color); */
+  color: var(--secondary-color);
+
+}
+
+div.coin-box-single {
+  border: 1px solid var(--secondary-color);
+  border-radius: 25px;
+  width: 26%;
+  min-width: 600px;
+  max-width: 600px;
+  width: 600px;
+  min-height: 600px;
+  flex-grow: 1;
+  margin: 10px;
+  padding: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  background-color: var(--primary-color);
   color: var(--secondary-color);
 
 }
