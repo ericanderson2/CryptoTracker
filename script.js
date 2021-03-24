@@ -4,11 +4,10 @@ var homeCoins = {'bitcoin': 1, 'litecoin': 2, 'aave': 3, '88mph': 4, 'ethereum':
 /*
     Call CoinGecko API. The call is async so we return a promise stating the value will be returned upon function completion
     @Param url: API url to access
-    @Return: Promise referring to the JSON response from the API call
+    @Return: JSON response from API
 */
 const coinAPICall = async (url) =>
 {
-    console.log(url);
     const response = await (await fetch(url, {method: 'GET', mode: 'cors'})).json();
     return response;
 }
@@ -37,17 +36,9 @@ async function getCoins()
     @Param coin: Id of the given coin
     @Param box_id: box # to update
 */
-const setHomeCoin = async (coin, box_id) =>
+const setHomeCoin = async (coin) =>
 {
-    //Get todays date. We need this b/c we're using the 'historical' API function and getting the current price. Kinda hacky but it gives us more precision
-    //var today = new Date();
-    //var dd = String(today.getDate()).padStart(2, '0');
-    //var mm = String(today.getMonth() + 1).padStart(2, '0'); //Months are indexed at 0
-    //var yyyy = today.getFullYear();
 
-    //Parse the date objects into a string
-    //today = dd + '-' + mm + '-' + yyyy;
-    //const coinURL = 'https://api.coingecko.com/api/v3/coins/' + coin + '/history?date=' + today + '&localization=false';
     const coinURL = 'https://api.coingecko.com/api/v3/coins/' + coin + '?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false';
     const coinJSON = await coinAPICall(coinURL);
     //Capitaliize first leter of the coin ID
@@ -58,43 +49,126 @@ const setHomeCoin = async (coin, box_id) =>
     coinTicker = coinJSON['symbol'].toUpperCase();
     coinStatus = coinJSON['market_data']['price_change_percentage_24h'].toFixed(2);
 
-    //Update doc to display price
-    document.getElementById('box' + box_id).innerHTML = coinPrice;
+    //Create container div for the coin
+    const coinDiv = document.createElement('div');
+
+    //Populate div with elements
+    //Coin image
+    divImg = document.createElement('img');
+    divImg.src = coinIMG;
+    divImg.classList.add('coinIMG');
+    //Header with coin name, ticker, and a link to the separate page
+    divName = document.createElement('h1');
+    divName.innerHTML = '<a class="coin-header" href="coin.html?id=' + coin + '">' + coinName + ' (' + coinTicker + ')' + '</a>';
+    //Price text
+    divPrice = document.createElement('p');
+    divPrice.innerHTML = coinPrice;
+    divPrice.classList.add('Prices');
+    //Percent change text
+    divChange= document.createElement('p');
+    divChange.classList.add('Changes');
+    //Add elements to parent div
+    coinDiv.appendChild(divImg);
+    coinDiv.appendChild(divName);
+    coinDiv.appendChild(divPrice);
+    coinDiv.appendChild(divChange);
+    //Create a div and canvas element for the graphs
+    chartDiv = document.createElement('div');
+    currChart = document.createElement('canvas');
+    currChart.classList.add('chart');
+    currChart.style.width = "300px";
+    currChart.style.height = "300px";
+    chartDiv.appendChild(currChart);
+    coinDiv.appendChild(chartDiv);
+
+
+    //Add the created div to the coin container
+    document.getElementById('coin-container').appendChild(coinDiv);
+
     if(coinStatus.charAt(0) == '-')
     {
         //color red if lost value
-        document.getElementById('change' + box_id).style.color = 'red';
-        document.getElementById('change' + box_id).innerHTML = coinStatus + '%';
-        makeChart(coin, box_id, 'red');
+        divChange.style.color = 'red';
+        divChange.innerHTML = coinStatus + '%';
+        makeChart(coin, currChart, 'red');
     }
     else
     {
         //color green if gained value
-        document.getElementById('change' + box_id).style.color = 'green';
-        document.getElementById('change' + box_id).innerHTML = '+' + coinStatus + '%';
-        makeChart(coin, box_id, 'green');
+        divChange.style.color = 'green';
+        divChange.innerHTML = '+' + coinStatus + '%';
+        makeChart(coin, currChart, 'green');
     }
-    document.getElementById('img' + box_id).src = coinIMG;
-    document.getElementById('head' + box_id).innerHTML = '<a href="coin.html?id=' + coin + '">' + coinName + ' (' + coinTicker + ')' + '</a>';
+    
+    return coinDiv;
+    
 
 }
 
 /*
     Initialize all boxes on the home page with data
 */
-function initCoins()
+async function initCoins()
 {
     //TODO: Populate dictionary with coins to showcase
+    
+
 
     for (var key in homeCoins)
     {
         //Display data for every coin and set an interval for them
-        setHomeCoin(key, homeCoins[key]);
-        setInterval(setHomeCoin, 100000, key, homeCoins[key]);
+        coinDiv = await setHomeCoin(key);
+        coinDiv.classList.add('coin-box');
     }
+    //setInterval(refreshCoinData, 10000);
 
 }
 
+/*
+    Refreshes the data for each coin currently on the screen
+*/
+async function refreshCoinData()
+{
+    //Loop through all current coin boxes on the page
+    var boxes = document.getElementsByClassName('coin-box')
+    for(var i = 0; i < boxes.length; i++)
+    {
+        //Get data that needs to update: price, %change, and the graph
+        const currBox = boxes[i];
+        const boxChildren = currBox.childNodes;
+        const coinName = boxChildren[1].innerHTML.match(/(?<=id=\s*).*?(?=\s*">)/gs);;
+        const boxPrice = boxChildren[2];
+        const boxChange = boxChildren[3];
+        const chartDiv = boxChildren[4];
+
+        chart = chartDiv.getElementsByClassName('chart')[0]
+        console.log(chart);
+        //Get new data and update the elements
+        const coinURL = 'https://api.coingecko.com/api/v3/coins/' + coinName + '?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false';
+        const coinJSON = await coinAPICall(coinURL);
+
+        const newCoinPrice = coinJSON['market_data']['current_price']['usd'];
+        const newCoinChange = coinJSON['market_data']['price_change_percentage_24h'].toFixed(2);
+        boxPrice.innerHTML = newCoinPrice;
+
+        if(newCoinChange.charAt(0) == '-')
+        {
+            //color red if lost value
+            boxChange.style.color = 'red';
+            boxChange.innerHTML = newCoinChange + '%';
+            makeChart(coinName, chart, 'red');
+        }
+        else
+        {
+            //color green if gained value
+            boxChange.style.color = 'green';
+            boxChange.innerHTML = '+' + newCoinChange + '%';
+            makeChart(coinName, chart, 'green');
+        }
+
+            
+    }
+}
 
 async function getSimplePrice(coin)
 {
@@ -107,26 +181,25 @@ async function getSimplePrice(coin)
 
 /*
     gathers historical data and calls chart() to graph recent 24 vol and prices.
+    @Param coin: Coin ID to get graph for
+    @Param chart: Chart to create/update
+    @Param color: Color of graph
 */
-const makeChart = async (coin, box_id, color) =>
+const makeChart = async (coin, chart, color) =>
 {
     const coinURL = 'https://api.coingecko.com/api/v3/coins/' + coin + '/market_chart?vs_currency=usd&days=' + 1;
     var coinPrice = await coinAPICall(coinURL);
-    chart(coinPrice['prices'], coinPrice['market_caps'], box_id, color);
-}
 
-/*
-    creates chart for a given coin.
-*/
-const chart = (prices, mcs, box_id, color) =>
-{
+    var mcs = coinPrice['market_caps'];
+    var prices = coinPrice['prices'];
     var coinMC = [], coinPrice = [], labels = [];
     for (var i = 0; i < mcs.length; i++){
         coinMC[i] = mcs[i][1];
         coinPrice[i] = prices[i][1];
         if (i < 125) labels[i] = '';
     }
-    new Chart(document.getElementById("chart" + box_id), {
+    
+    new Chart(chart, {
         type: 'line',
         data: {
           labels: labels,
@@ -149,3 +222,4 @@ const chart = (prices, mcs, box_id, color) =>
         }
     });
 }
+

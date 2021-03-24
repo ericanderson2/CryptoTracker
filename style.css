@@ -188,3 +188,21 @@ img.coinIMG
 
 .dropdown-content a:hover {background-color: --secondary-color}
 .show {display:block;}
+
+a.coin-header
+{
+  color: var(--secondary-color);
+  margin: 20px;
+  color: #9E9E9E;
+	font-family: arial, sans-serif;
+	font-size: 28px;
+  display: block;
+  text-align: center;
+  padding-left: 14px;
+  text-decoration: none;
+}
+
+a.coin-header:hover
+{
+  color: white;
+}
