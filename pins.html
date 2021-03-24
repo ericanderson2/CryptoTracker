@@ -2,16 +2,15 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <title>CryptoTracker</title>
+    <title>My Pins</title>
     <link rel="stylesheet" href="style.css"></link>
     <script type="text/javascript" src="script.js"></script>
-    <script type="text/javascript" src="view_coin.js"></script>
   </head>
-  <body>
+  <body onload="javascript:loadCookies()">
 
     <ul class="header">
       <li><a id="index" href="index.html">CryptoTracker</a></li>
-      <li><a id="pins" href="">My Pins</a></li>
+      <li><a id="pins" href="pins.html">My Pins</a></li>
       <li>
           <!-- could add coin list here instead of sidebar... but maybe put on right side. Just an opinion, do whatever u want. -->
           <div class="dropdown">
@@ -25,12 +24,13 @@
       </li>
     </ul>
 
-    <div class="main">
+    
 
-    <div class="coin-box-single" id="coin-container">
-      
-    </div>
-
+    <div class="main" id="main">
+        <div class="main-panel">
+            <div class="panel-control"></div>
+            <div class="coins-container" id="coin-container">
+        </div>
     </div>
 
   </body>

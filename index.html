@@ -5,12 +5,13 @@
     <title>CryptoTracker</title>
     <link rel="stylesheet" href="style.css">
     <script type="text/javascript" src="script.js"></script>
+    <script src="https://code.iconify.design/1/1.0.7/iconify.min.js"></script>
   </head>
   <body onload="javascript:initCoins()">
 
     <ul class="header">
       <li><a id="index" href="index.html">CryptoTracker</a></li>
-      <li><a id="pins" href="">My Pins</a></li>
+      <li><a id="pins" href="pins.html">My Pins</a></li>
       <li>
           <!-- could add coin list here instead of sidebar... but maybe put on right side. Just an opinion, do whatever u want. -->
         <div class="dropdown">
@@ -21,20 +22,13 @@
           <a href="#">Link 3</a>
         </div>
       </div></li>
-      <li><a href="coin.html?id=bitcoin">Test</a></li>
     </ul>
 
     <div class="main">
-
-    <div class="main-panel">
-      <div class="panel-control">
-       <!-- <h1>Featured</h1> -->
+      <div class="main-panel">
+        <div class="panel-control"></div>
+        <div class="coins-container" id="coin-container">
       </div>
-
-    <div class="coins-container" id="coin-container">
-      
-    </div>
-
     </div>
 
     <!-- <div class="sidebar">

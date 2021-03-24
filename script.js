@@ -1,5 +1,7 @@
 //All coin IDS and their box IDS on the homepage
 var homeCoins = {'bitcoin': 1, 'litecoin': 2, 'aave': 3, '88mph': 4, 'ethereum': 5, 'polkadot': 6, 'dogecoin': 7, '1inch': 8, 'cardano': 9, 'kompass': 10};
+var userCoins = {};
+var numCookies;
 
 /*
     Call CoinGecko API. The call is async so we return a promise stating the value will be returned upon function completion
@@ -64,6 +66,12 @@ const setHomeCoin = async (coin) =>
     divPrice = document.createElement('p');
     divPrice.innerHTML = coinPrice;
     divPrice.classList.add('Prices');
+    //Favorite star
+    divStar = document.createElement('button');
+    divStar.classList.add('iconify');
+    divStar.setAttribute('data-icon', "dashicons:star-empty");
+    divStar.addEventListener("click", addCookie());
+    divStar.setAttribute('data-inline', "false");
     //Percent change text
     divChange= document.createElement('p');
     divChange.classList.add('Changes');
@@ -72,6 +80,7 @@ const setHomeCoin = async (coin) =>
     coinDiv.appendChild(divName);
     coinDiv.appendChild(divPrice);
     coinDiv.appendChild(divChange);
+    coinDiv.appendChild(divStar);
     //Create a div and canvas element for the graphs
     chartDiv = document.createElement('div');
     currChart = document.createElement('canvas');
@@ -112,8 +121,6 @@ async function initCoins()
 {
     //TODO: Populate dictionary with coins to showcase
     
-
-
     for (var key in homeCoins)
     {
         //Display data for every coin and set an interval for them
@@ -223,3 +230,25 @@ const makeChart = async (coin, chart, color) =>
     });
 }
 
+function addCookie(coin)
+{
+    
+}
+
+function loadCookies()
+{
+    userCoins = document.cookie;
+    console.log(userCoins);
+    if(userCoins.length == 0)
+    {
+        noPins = document.createElement('h1');
+        noPins.innerHTML = "You haven't favorited any coins yet.";
+        document.getElementById('main').appendChild(noPins);
+        numCookies = 0;
+        return;
+    }
+    else
+    {
+        alert('here');
+    }
+}
