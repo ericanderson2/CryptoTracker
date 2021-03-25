@@ -1,4 +1,4 @@
-
+var allCoinList = [];
 
 /*
     Call CoinGecko API. The call is async so we return a promise stating the value will be returned upon function completion
@@ -23,11 +23,8 @@ async function getCoins()
     //Insert data into a dicitonary
     for (var i = 0; i < coinData.length; i++)
     {
-        coinDict[coinData[i].id] = coinData[i].name
+        allCoinList.push(coinData[i].id);
     }
-    //Currently just logs the dict. Can be configured as a return value, etc.
-    //console.log(coinDict);
-    return coinDict;
 }
 
 /*
@@ -47,7 +44,7 @@ const setHomeCoin = async (data) =>
     coinStatus = data['price_change_percentage_24h'].toFixed(2);
 
     coinMarketData = data['sparkline_in_7d']['price'];
-
+    
     //Create container div for the coin
     const coinDiv = document.createElement('div');
 
@@ -67,7 +64,7 @@ const setHomeCoin = async (data) =>
     divStar = document.createElement('button');
     divStar.classList.add('iconify');
     divStar.setAttribute('data-icon', "dashicons:star-empty");
-    divStar.addEventListener("click", addCookie());
+    divStar.addEventListener("click", "addCookie()");
     divStar.setAttribute('data-inline', "false");
     //Percent change text
     divChange= document.createElement('p');
@@ -105,9 +102,9 @@ const setHomeCoin = async (data) =>
         divChange.innerHTML = '+' + coinStatus + '%';
         makeChart(coinMarketData, currChart, 'green');
     }
-
+    
     return coinDiv;
-
+    
 
 }
 
@@ -179,7 +176,7 @@ async function refreshCoinData(url)
             makeChart(coinMarketData, chart, 'green');
         }
 
-
+            
     }
 }
 
@@ -195,7 +192,7 @@ const makeChart = async (coinData, chart, color) =>
     for (var i = 0; i < 125; i++){
         labels[i] = '';
     }
-
+    
     new Chart(chart, {
         type: 'line',
         data: {
@@ -218,7 +215,6 @@ function initSingleCoin()
     var ids = [url.substring(url.indexOf("?id=") + 4)];
     initCoins(ids, 'coin-box-single');
 }
-
 function addCookie(coin)
 {
   if (coin == undefined) {
@@ -270,4 +266,30 @@ function deleteCookies() {
     document.cookie = cookies[i - 1] + ";max-age=0";
   }
   window.location.reload(true);
+}
+
+async function displayAllCoins()
+{
+    await getCoins();
+    allCoinList = allCoinList.filter(e => !e.includes('-'));
+    var urlStr = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=' + allCoinList.slice(0, 50).join('%2C%20') + '&order=market_cap_desc&per_page=250&page=1&sparkline=false';
+    resp = await coinAPICall(urlStr);
+    var table = document.createElement('table');
+    table.style.width = "100%";
+    table.setAttribute('border', '1');
+    var tbdy = document.createElement('tbody');
+    for(var i = 0; i < resp.length; i++)
+    {
+        var tr = document.createElement('tr');
+        var td1 = document.createElement('td');
+        td1.appendChild(document.createTextNode(resp[i].name));
+        var td2 = document.createElement('td');
+        td2.appendChild(document.createTextNode(resp[i].current_price));
+        tr.appendChild(td1);
+        tr.appendChild(td2);
+        tbdy.appendChild(tr);
+
+    }
+    table.appendChild(tbdy);
+    document.getElementById('coin-container').appendChild(table);
 }
