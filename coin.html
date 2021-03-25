@@ -5,9 +5,8 @@
     <title>CryptoTracker</title>
     <link rel="stylesheet" href="style.css"></link>
     <script type="text/javascript" src="script.js"></script>
-    <script type="text/javascript" src="view_coin.js"></script>
   </head>
-  <body>
+  <body onload="javascript:initSingleCoin()">
 
     <ul class="header">
       <li><a id="index" href="index.html">CryptoTracker</a></li>
@@ -25,10 +24,7 @@
       </li>
     </ul>
 
-    <div class="main">
-
-    <div class="coin-box-single" id="coin-container">
-      
+    <div class="main" id = "coin-container">
     </div>
 
     </div>

@@ -1,7 +1,4 @@
-//All coin IDS and their box IDS on the homepage
-var homeCoins = {'bitcoin': 1, 'litecoin': 2, 'aave': 3, '88mph': 4, 'ethereum': 5, 'polkadot': 6, 'dogecoin': 7, '1inch': 8, 'cardano': 9, 'kompass': 10};
-var userCoins = {};
-var numCookies;
+
 
 /*
     Call CoinGecko API. The call is async so we return a promise stating the value will be returned upon function completion
@@ -34,23 +31,23 @@ async function getCoins()
 }
 
 /*
-    Sets the name and price of a coin on the homepage to 10 decimal places
-    @Param coin: Id of the given coin
-    @Param box_id: box # to update
+    Displays the coin on the current page
+    @Param data: JSON data of the current coin
 */
-const setHomeCoin = async (coin) =>
+const setHomeCoin = async (data) =>
 {
-
-    const coinURL = 'https://api.coingecko.com/api/v3/coins/' + coin + '?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false';
-    const coinJSON = await coinAPICall(coinURL);
-    //Capitaliize first leter of the coin ID
-    coinName = coin.charAt(0).toUpperCase() + coin.slice(1);
+    //Get coin ID
+    coinID = data['id'];
+    //Get coin name
+    coinName = data['name'];
     //Get the current price, image, ticker, and percent change from the coin's JSON data
-    coinPrice = coinJSON['market_data']['current_price']['usd'];
-    coinIMG = coinJSON['image']['thumb'];
-    coinTicker = coinJSON['symbol'].toUpperCase();
-    coinStatus = coinJSON['market_data']['price_change_percentage_24h'].toFixed(2);
+    coinPrice = data['current_price'];
+    coinIMG = data['image'];
+    coinTicker = data['symbol'].toUpperCase();
+    coinStatus = data['price_change_percentage_24h'].toFixed(2);
 
+    coinMarketData = data['sparkline_in_7d']['price'];
+    
     //Create container div for the coin
     const coinDiv = document.createElement('div');
 
@@ -58,10 +55,10 @@ const setHomeCoin = async (coin) =>
     //Coin image
     divImg = document.createElement('img');
     divImg.src = coinIMG;
-    divImg.classList.add('coinIMG');
+    divImg.classList.add('coin-img');
     //Header with coin name, ticker, and a link to the separate page
     divName = document.createElement('h1');
-    divName.innerHTML = '<a class="coin-header" href="coin.html?id=' + coin + '">' + coinName + ' (' + coinTicker + ')' + '</a>';
+    divName.innerHTML = '<a class="coin-header" href="coin.html?id=' + coinID + '">' + coinName + ' (' + coinTicker + ')' + '</a>';
     //Price text
     divPrice = document.createElement('p');
     divPrice.innerHTML = coinPrice;
@@ -99,14 +96,14 @@ const setHomeCoin = async (coin) =>
         //color red if lost value
         divChange.style.color = 'red';
         divChange.innerHTML = coinStatus + '%';
-        makeChart(coin, currChart, 'red');
+        makeChart(coinMarketData, currChart, 'red');
     }
     else
     {
         //color green if gained value
         divChange.style.color = 'green';
         divChange.innerHTML = '+' + coinStatus + '%';
-        makeChart(coin, currChart, 'green');
+        makeChart(coinMarketData, currChart, 'green');
     }
     
     return coinDiv;
@@ -116,75 +113,75 @@ const setHomeCoin = async (coin) =>
 
 /*
     Initialize all boxes on the home page with data
+    @Param coinList: List of coin IDS to get data for
 */
-async function initCoins()
+async function initCoins(coinList, cssClass)
 {
     //TODO: Populate dictionary with coins to showcase
-    
-    for (var key in homeCoins)
+
+    //Put all elements in the array into 1 string with the below substring between them
+    var urlStr = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=' + coinList.join('%2C%20') + '&order=market_cap_desc&per_page=100&page=1&sparkline=true';
+    console.log(urlStr);
+
+    resp = await coinAPICall(urlStr);
+    for (var i = 0; i < resp.length; i++)
     {
         //Display data for every coin and set an interval for them
-        coinDiv = await setHomeCoin(key);
-        coinDiv.classList.add('coin-box');
+        coinDiv = await setHomeCoin(resp[i]);
+        coinDiv.classList.add(cssClass);
     }
-    //setInterval(refreshCoinData, 10000);
+    setInterval(refreshCoinData, 10000, urlStr);
 
 }
 
 /*
     Refreshes the data for each coin currently on the screen
 */
-async function refreshCoinData()
+async function refreshCoinData(url)
 {
+    //Get new data on all of the current coins
+    var resp = await coinAPICall(url);
+
     //Loop through all current coin boxes on the page
     var boxes = document.getElementsByClassName('coin-box')
     for(var i = 0; i < boxes.length; i++)
     {
+        coinJSON = resp[i];
         //Get data that needs to update: price, %change, and the graph
         const currBox = boxes[i];
         const boxChildren = currBox.childNodes;
-        const coinName = boxChildren[1].innerHTML.match(/(?<=id=\s*).*?(?=\s*">)/gs);;
+        console.log(boxChildren);
+        const coinName = boxChildren[1].innerHTML.match(/(?<=id=\s*).*?(?=\s*">)/gs);
         const boxPrice = boxChildren[2];
         const boxChange = boxChildren[3];
-        const chartDiv = boxChildren[4];
+        const chartDiv = boxChildren[5];
 
-        chart = chartDiv.getElementsByClassName('chart')[0]
-        console.log(chart);
-        //Get new data and update the elements
-        const coinURL = 'https://api.coingecko.com/api/v3/coins/' + coinName + '?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false';
-        const coinJSON = await coinAPICall(coinURL);
-
-        const newCoinPrice = coinJSON['market_data']['current_price']['usd'];
-        const newCoinChange = coinJSON['market_data']['price_change_percentage_24h'].toFixed(2);
+        var coinMarketData = coinJSON['sparkline_in_7d']['price'];
+        chart = chartDiv.getElementsByClassName('chart')[0];
+        const newCoinPrice = coinJSON['current_price'];
+        const newCoinChange = coinJSON['price_change_percentage_24h'].toFixed(2);
         boxPrice.innerHTML = newCoinPrice;
+
+        console.log(chartDiv);
 
         if(newCoinChange.charAt(0) == '-')
         {
             //color red if lost value
             boxChange.style.color = 'red';
             boxChange.innerHTML = newCoinChange + '%';
-            makeChart(coinName, chart, 'red');
+            makeChart(coinMarketData, chart, 'red');
         }
         else
         {
             //color green if gained value
             boxChange.style.color = 'green';
             boxChange.innerHTML = '+' + newCoinChange + '%';
-            makeChart(coinName, chart, 'green');
+            makeChart(coinMarketData, chart, 'green');
         }
 
             
     }
 }
-
-async function getSimplePrice(coin)
-{
-    const coinURL = 'https://api.coingecko.com/api/v3/simple/price?ids=' + coin + '&vs_currencies=usd&include_market_cap=false&include_24hr_vol=false&include_24hr_change=false&include_last_updated_at=true';
-    const coinPrice = await coinAPICall(coinURl);
-    document.getElementById('box1').innerHTML = coinPrice[coin]["usd"].toFixed(2);
-
-}
-
 
 /*
     gathers historical data and calls chart() to graph recent 24 vol and prices.
@@ -192,18 +189,11 @@ async function getSimplePrice(coin)
     @Param chart: Chart to create/update
     @Param color: Color of graph
 */
-const makeChart = async (coin, chart, color) =>
+const makeChart = async (coinData, chart, color) =>
 {
-    const coinURL = 'https://api.coingecko.com/api/v3/coins/' + coin + '/market_chart?vs_currency=usd&days=' + 1;
-    var coinPrice = await coinAPICall(coinURL);
-
-    var mcs = coinPrice['market_caps'];
-    var prices = coinPrice['prices'];
-    var coinMC = [], coinPrice = [], labels = [];
-    for (var i = 0; i < mcs.length; i++){
-        coinMC[i] = mcs[i][1];
-        coinPrice[i] = prices[i][1];
-        if (i < 125) labels[i] = '';
+    labels = [];
+    for (var i = 0; i < 125; i++){
+        labels[i] = '';
     }
     
     new Chart(chart, {
@@ -211,25 +201,23 @@ const makeChart = async (coin, chart, color) =>
         data: {
           labels: labels,
             datasets: [{
-                data: coinPrice,
+                data: coinData,
                 label: "price",
                 borderColor: color,
                 pointBorderColor: 'none',
                 fill: false
-            }, {
-                data: coinMC,
-                label: "market cap",
-                borderColor: color,
-                pointBorderColor: 'none',
-                fill: false,
-                hidden: true
-            }
-            ]
+            }]
 
         }
     });
 }
 
+function initSingleCoin()
+{
+    var url = window.location.href;
+    var ids = [url.substring(url.indexOf("?id=") + 4)];
+    initCoins(ids, 'coin-box-single');
+}
 function addCookie(coin)
 {
     
