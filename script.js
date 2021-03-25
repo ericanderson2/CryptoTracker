@@ -26,8 +26,8 @@ async function getCoins()
         coinDict[coinData[i].id] = coinData[i].name
     }
     //Currently just logs the dict. Can be configured as a return value, etc.
-    console.log(coinDict);
-
+    //console.log(coinDict);
+    return coinDict;
 }
 
 /*
@@ -47,7 +47,7 @@ const setHomeCoin = async (data) =>
     coinStatus = data['price_change_percentage_24h'].toFixed(2);
 
     coinMarketData = data['sparkline_in_7d']['price'];
-    
+
     //Create container div for the coin
     const coinDiv = document.createElement('div');
 
@@ -105,9 +105,9 @@ const setHomeCoin = async (data) =>
         divChange.innerHTML = '+' + coinStatus + '%';
         makeChart(coinMarketData, currChart, 'green');
     }
-    
+
     return coinDiv;
-    
+
 
 }
 
@@ -179,7 +179,7 @@ async function refreshCoinData(url)
             makeChart(coinMarketData, chart, 'green');
         }
 
-            
+
     }
 }
 
@@ -195,7 +195,7 @@ const makeChart = async (coinData, chart, color) =>
     for (var i = 0; i < 125; i++){
         labels[i] = '';
     }
-    
+
     new Chart(chart, {
         type: 'line',
         data: {
@@ -218,9 +218,17 @@ function initSingleCoin()
     var ids = [url.substring(url.indexOf("?id=") + 4)];
     initCoins(ids, 'coin-box-single');
 }
+
 function addCookie(coin)
 {
-    
+  if (coin == undefined) {
+    return;
+  }
+  var num_cookies = document.cookie.split(";").length;
+  if (document.cookie != "") {
+    num_cookies += 1
+  }
+  document.cookie = num_cookies + "=" + coin;
 }
 
 function loadCookies()
@@ -237,6 +245,29 @@ function loadCookies()
     }
     else
     {
-        alert('here');
+        var cookies = document.cookie.split(";");
+        var pinnedCoins = [];
+
+        for(let i = 1; i <= cookies.length; i++) {
+          var id = cookies[i - 1].split("=")[1];
+          pinnedCoins.push(id);
+        }
+        initCoins(pinnedCoins);
     }
+}
+
+function addPin() {
+  var id = document.getElementById("pin_input").value;
+  addCookie(id);
+  window.location.reload(true);
+}
+
+/* for debugging */
+function deleteCookies() {
+  var cookies = document.cookie.split(";");
+
+  for(let i = 1; i <= cookies.length; i++) {
+    document.cookie = cookies[i - 1] + ";max-age=0";
+  }
+  window.location.reload(true);
 }
