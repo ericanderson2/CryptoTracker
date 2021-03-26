@@ -173,9 +173,7 @@ async function refreshCoinData(url)
             boxChange.style.color = 'green';
             boxChange.innerHTML = '+' + newCoinChange + '%';
             makeChart(coinMarketData, chart, 'green');
-        }
-
-            
+        } 
     }
 }
 
@@ -193,16 +191,29 @@ const setSingleCoin = async (data, moreData) =>
      coinPrice = data['current_price'];
      coinIMG = data['image'];
      coinTicker = data['symbol'].toUpperCase();
+    
+    coinMc = data['market_cap'];        // could be 0
+    coinMcRank = data['market_cap_rank'];   // could be null
+    coinTotalVol = data['total_volume'];
+    coinHigh = data['high_24h'];
+    coinLow = data['low_24h'];
 
     coinStatus = {}
-    coinStatus['1h'] =  data['price_change_percentage_1h_in_currency'].toFixed(2);
-    coinStatus['24h'] =  data['price_change_percentage_24h_in_currency'].toFixed(2);
-    coinStatus['7d'] =  data['price_change_percentage_7d_in_currency'].toFixed(2);
-    coinStatus['14d'] =  data['price_change_percentage_14d_in_currency'].toFixed(2);
-    coinStatus['30d'] =  data['price_change_percentage_30d_in_currency'].toFixed(2);
-    coinStatus['1y'] =  data['price_change_percentage_1y_in_currency'].toFixed(2);
+    if (data['price_change_percentage_1h_in_currency']!=null)
+        coinStatus['1h'] =  data['price_change_percentage_1h_in_currency'].toFixed(2);
+    if (data['price_change_percentage_24h_in_currency']!=null)
+        coinStatus['24h'] =  data['price_change_percentage_24h_in_currency'].toFixed(2);
+    if (data['price_change_percentage_7d_in_currency']!=null)
+        coinStatus['7d'] =  data['price_change_percentage_7d_in_currency'].toFixed(2);
+    if (data['price_change_percentage_14d_in_currency']!=null)
+        coinStatus['14d'] =  data['price_change_percentage_14d_in_currency'].toFixed(2);
+    if (data['price_change_percentage_30d_in_currency']!=null)
+        coinStatus['30d'] =  data['price_change_percentage_30d_in_currency'].toFixed(2);
+    if (data['price_change_percentage_1y_in_currency']!=null)
+        coinStatus['1y'] =  data['price_change_percentage_1y_in_currency'].toFixed(2);
 
     coinDesc = moreData['description']['en'];
+
 
     coinMarketData = data['sparkline_in_7d']['price'];
      
@@ -240,8 +251,8 @@ const setSingleCoin = async (data, moreData) =>
      chartDiv = document.createElement('div');
      currChart = document.createElement('canvas');
      currChart.classList.add('chart');
-     currChart.style.width = "300px";
-     currChart.style.height = "200px";
+     currChart.style.width = "400px";
+     currChart.style.height = "300px";
      chartDiv.appendChild(currChart);
      coinDiv.appendChild(chartDiv);
 
@@ -266,21 +277,23 @@ const setSingleCoin = async (data, moreData) =>
         if(coinStatus[key].charAt(0) == '-')
         {
             divStatus.style.color = 'red'  
-            divStatus.innerHTML = coinStatus[key];
+            divStatus.innerHTML = coinStatus[key] + '%';
         }
         else
         {
             divStatus.style.color = 'green'  
-            divStatus.innerHTML = '+' + coinStatus[key];
+            divStatus.innerHTML = '+' + coinStatus[key] + '%';
         }
      }
      table.appendChild(tableData);
      coinDiv.appendChild(table);
 
-    desc = document.createElement('p');
-    desc.innerHTML = coinDesc;
-    desc.classList.add('coin-desc-single');
-    coinDiv.appendChild(desc);
+    if (coinDesc!=''){
+        divDesc = document.createElement('p');
+        divDesc.innerHTML = coinDesc;
+        divDesc.classList.add('coin-desc-single');
+        coinDiv.appendChild(divDesc);
+    }
 
      document.getElementById('coin-container').appendChild(coinDiv);
  
