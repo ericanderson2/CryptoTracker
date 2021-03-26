@@ -183,7 +183,7 @@ async function refreshCoinData(url)
     Displays the coin on the single coin page
     @Param data: JSON data of the current coin
 */
-const setSingleCoin = async (data) =>
+const setSingleCoin = async (data, moreData) =>
 {
      //Get coin ID
      coinID = data['id'];
@@ -202,7 +202,9 @@ const setSingleCoin = async (data) =>
     coinStatus['30d'] =  data['price_change_percentage_30d_in_currency'].toFixed(2);
     coinStatus['1y'] =  data['price_change_percentage_1y_in_currency'].toFixed(2);
 
-     coinMarketData = data['sparkline_in_7d']['price'];
+    coinDesc = moreData['description']['en'];
+
+    coinMarketData = data['sparkline_in_7d']['price'];
      
      //Create container div for the coin
      const coinDiv = document.createElement('div');
@@ -243,7 +245,6 @@ const setSingleCoin = async (data) =>
      chartDiv.appendChild(currChart);
      coinDiv.appendChild(chartDiv);
 
-     
      const table  = document.createElement('table');
      const tableLabels = document.createElement('tr');
      for (var key in coinStatus)
@@ -276,6 +277,11 @@ const setSingleCoin = async (data) =>
      table.appendChild(tableData);
      coinDiv.appendChild(table);
 
+    desc = document.createElement('p');
+    desc.innerHTML = coinDesc;
+    desc.classList.add('coin-desc-single');
+    coinDiv.appendChild(desc);
+
      document.getElementById('coin-container').appendChild(coinDiv);
  
      if(coinStatus['7d'].charAt(0) == '-')
@@ -294,23 +300,6 @@ const setSingleCoin = async (data) =>
      }
      return coinDiv;
 }
-
-/*
-    Displays more coin info the single coin page
-    @Param data: JSON data of the current coin
-*/
-async function setSingleDesc(data){
-    coinDesc = data['description']['en'];
-    const divDesc = document.createElement('div');
-    desc = document.createElement('h4');
-    desc.innerHTML = coinDesc;
-    divDesc.classList.add('price-table-single');
-    divDesc.appendChild(desc);
-    document.getElementById('coin-description').appendChild(divDesc);
-    
-    return divDesc;
-}
-
 /*
     Initialize coin on the single coin page
 */
@@ -325,13 +314,11 @@ async function initSingleCoin()
     var urlStr2 = 'https://api.coingecko.com/api/v3/coins/' + id + '?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false';
 
     // console.log(urlStr);
-    resp = await coinAPICall(urlStr1);
-    coinDiv = await setSingleCoin(resp[0]);
-    coinDiv.classList.add('coin-box-single');
-
+    resp1 = await coinAPICall(urlStr1);
     resp2 = await coinAPICall(urlStr2);
-    coinDiv = await setSingleDesc(resp2);
-    coinDiv.classList.add('coin-desc-single');
+
+    coinDiv = await setSingleCoin(resp1[0], resp2);
+    coinDiv.classList.add('coin-box-single');
 }
 
 /*
