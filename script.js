@@ -55,6 +55,7 @@ const setHomeCoin = async (data) =>
     
     //Create container div for the coin
     const coinDiv = document.createElement('div');
+    coinDiv.classList.add('coin-box-div');
 
     //Populate div with elements
     //Coin image
@@ -70,19 +71,21 @@ const setHomeCoin = async (data) =>
     divPrice.classList.add('Prices');
     //Favorite star
     divStar = document.createElement('button');
-    divStar.classList.add('iconify');
-    divStar.setAttribute('data-icon', "dashicons:star-empty");
-    divStar.addEventListener("click", addCookie);
-    divStar.setAttribute('data-inline', "false");
+    divStar.classList.add('fav-button');
+    divStar.value = coinID;
+    divStar.onclick = function(){addCookie(this);};
     //Percent change text
     divChange= document.createElement('p');
     divChange.classList.add('Changes');
     //Add elements to parent div
-    coinDiv.appendChild(divImg);
-    coinDiv.appendChild(divName);
-    coinDiv.appendChild(divPrice);
-    coinDiv.appendChild(divChange);
-    coinDiv.appendChild(divStar);
+    const headingDiv = document.createElement('div');
+    headingDiv.classList.add('box-heading');
+    headingDiv.appendChild(divImg);
+    headingDiv.appendChild(divName);
+    headingDiv.appendChild(divStar);
+    headingDiv.appendChild(divPrice);
+    headingDiv.appendChild(divChange);
+    coinDiv.appendChild(headingDiv);
     //Create a div and canvas element for the graphs
     chartDiv = document.createElement('div');
     currChart = document.createElement('canvas');
@@ -176,10 +179,11 @@ async function refreshCoinData(url)
         //Get data that needs to update: price, %change, and the graph
         const currBox = boxes[i];
         const boxChildren = currBox.childNodes;
-        const coinName = boxChildren[1].innerHTML.match(/(?<=id=\s*).*?(?=\s*">)/gs);
-        const boxPrice = boxChildren[2];
-        const boxChange = boxChildren[3];
-        const chartDiv = boxChildren[5];
+        const headChildren = boxChildren[0].childNodes;
+        const coinName = headChildren[1].innerHTML.match(/(?<=id=\s*).*?(?=\s*">)/gs);
+        const boxPrice = headChildren[3];
+        const boxChange = headChildren[4];
+        const chartDiv = boxChildren[1];
 
         var coinMarketData = coinJSON['sparkline_in_7d']['price'];
         chart = chartDiv.getElementsByClassName('chart')[0];
@@ -362,7 +366,6 @@ async function initSingleCoin()
         
     var urlStr2 = 'https://api.coingecko.com/api/v3/coins/' + id + '?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false';
 
-    // console.log(urlStr);
     resp1 = await coinAPICall(urlStr1);
     resp2 = await coinAPICall(urlStr2);
 
@@ -401,15 +404,20 @@ const makeChart = async (coinData, chart, color) =>
 
 function addCookie(coin)
 {
-    console.log(coin);
-  if (coin == undefined) {
-    return;
-  }
-  var num_cookies = document.cookie.split(";").length;
-  if (document.cookie != "") {
-    num_cookies += 1
-  }
-  document.cookie = num_cookies + "=" + coin;
+    coinID = coin.value;
+    var numCookies = document.cookie.split(";").length;
+    if (document.cookie != "") 
+    {
+        numCookies += 1
+    }
+
+    let date = new Date(Date.now() + 86400e3);
+    date = date.toUTCString();
+    //Need to set expiration date for cookies or they're only for the current page load
+    cookieStr = numCookies + '=' + coinID + '; expires=' + date + '; path=/; domain=localhost;';
+    console.log(cookieStr);
+    document.cookie = cookieStr;
+    alert(document.cookie);
 }
 
 function loadCookies()
@@ -451,35 +459,4 @@ function deleteCookies() {
     document.cookie = cookies[i - 1] + ";max-age=0";
   }
   window.location.reload(true);
-}
-
-async function displayAllCoins()
-{
-    await getCoins();
-    allCoinList = allCoinList.filter(e => !e.includes('-'));
-    var urlStr = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=' + allCoinList.slice(0,50).join('%2C%20') + '&order=market_cap_desc&per_page=250&page=1&sparkline=false';
-    console.log(allCoinList.slice(0, 50).join(', '));
-    resp = await coinAPICall(urlStr);
-    var table = document.createElement('table');
-    table.style.width = "100%";
-    table.setAttribute('border', '1');
-    var tbdy = document.createElement('tbody');
-    for(var i = 0; i < resp.length; i++)
-    {
-        var tr = document.createElement('tr');
-        var td1 = document.createElement('td');
-        td1.appendChild(document.createTextNode(resp[i].name));
-        var td2 = document.createElement('td');
-        var img = document.createElement('img');
-        img.src = resp[i].image;
-        img.classList.add('coin-img');
-        td2.appendChild(img);
-        tr.appendChild(td1);
-        tr.appendChild(td2);
-       tbdy.appendChild(tr);
-
-    }
-    table.appendChild(tbdy);
-    document.getElementById('coin-container').appendChild(table);
-
 }
