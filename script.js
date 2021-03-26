@@ -193,21 +193,21 @@ async function refreshCoinData(url)
         var coinMarketData = coinJSON['sparkline_in_7d']['price'];
         chart = chartDiv.getElementsByClassName('chart')[0];
         const newCoinPrice = coinJSON['current_price'];
-        var coinStatus;
-        if (data['price_change_percentage_1h_in_currency']!=null)
-            coinStatus =  data['price_change_percentage_1h_in_currency'].toFixed(2);
-        else if (data['price_change_percentage_24h_in_currency']!=null)
-            coinStatus =  data['price_change_percentage_24h_in_currency'].toFixed(2);
-        else if (data['price_change_percentage_7d_in_currency']!=null)
-            coinStatus =  data['price_change_percentage_7d_in_currency'].toFixed(2);
-        else if (data['price_change_percentage_14d_in_currency']!=null)
-            coinStatus =  data['price_change_percentage_14d_in_currency'].toFixed(2);
-        else if (data['price_change_percentage_30d_in_currency']!=null)
-            coinStatus =  data['price_change_percentage_30d_in_currency'].toFixed(2);
-        else if (data['price_change_percentage_1y_in_currency']!=null)
-            coinStatus =  data['price_change_percentage_1y_in_currency'].toFixed(2);
+        var newCoinChange;
+        if (coinJSON['price_change_percentage_1h_in_currency']!=null)
+            newCoinChange =  coinJSON['price_change_percentage_1h_in_currency'].toFixed(2);
+        else if (coinJSON['price_change_percentage_24h_in_currency']!=null)
+            newCoinChange =  coinJSON['price_change_percentage_24h_in_currency'].toFixed(2);
+        else if (coinJSON['price_change_percentage_7d_in_currency']!=null)
+            newCoinChange =  coinJSON['price_change_percentage_7d_in_currency'].toFixed(2);
+        else if (coinJSON['price_change_percentage_14d_in_currency']!=null)
+            newCoinChange =  coinJSON['price_change_percentage_14d_in_currency'].toFixed(2);
+        else if (coinJSON['price_change_percentage_30d_in_currency']!=null)
+            newCoinChange =  coinJSON['price_change_percentage_30d_in_currency'].toFixed(2);
+        else if (coinJSON['price_change_percentage_1y_in_currency']!=null)
+            newCoinChange =  coinJSON['price_change_percentage_1y_in_currency'].toFixed(2);
         else
-            coinStatus = 'No change data';
+            newCoinChange = 'No change data';
         boxPrice.innerHTML = newCoinPrice;
 
         console.log(chartDiv);
@@ -417,6 +417,7 @@ const makeChart = async (coinData, chart, color) =>
 
 function addCookie(coin)
 {
+    console.log(coin);
   if (coin == undefined) {
     return;
   }
