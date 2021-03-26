@@ -25,6 +25,7 @@ async function getCoins()
     {
         allCoinList.push(coinData[i].id);
     }
+    return allCoinList;
 }
 
 /*
@@ -35,13 +36,28 @@ const setHomeCoin = async (data) =>
 {
     //Get coin ID
     coinID = data['id'];
+    console.log(coinID);
     //Get coin name
     coinName = data['name'];
     //Get the current price, image, ticker, and percent change from the coin's JSON data
     coinPrice = data['current_price'];
     coinIMG = data['image'];
     coinTicker = data['symbol'].toUpperCase();
-    coinStatus = data['price_change_percentage_7d_in_currency'].toFixed(2);
+    //If a price for the 7d is null, calculate it manually
+    if (data['price_change_percentage_1h_in_currency']!=null)
+        coinStatus =  data['price_change_percentage_1h_in_currency'].toFixed(2);
+    else if (data['price_change_percentage_24h_in_currency']!=null)
+        coinStatus =  data['price_change_percentage_24h_in_currency'].toFixed(2);
+    else if (data['price_change_percentage_7d_in_currency']!=null)
+        coinStatus =  data['price_change_percentage_7d_in_currency'].toFixed(2);
+    else if (data['price_change_percentage_14d_in_currency']!=null)
+        coinStatus =  data['price_change_percentage_14d_in_currency'].toFixed(2);
+    else if (data['price_change_percentage_30d_in_currency']!=null)
+        coinStatus =  data['price_change_percentage_30d_in_currency'].toFixed(2);
+    else if (data['price_change_percentage_1y_in_currency']!=null)
+        coinStatus =  data['price_change_percentage_1y_in_currency'].toFixed(2);
+    else
+        coinStatus = 'No change data'
     coinMarketData = data['sparkline_in_7d']['price'];
     
     //Create container div for the coin
@@ -106,22 +122,44 @@ const setHomeCoin = async (data) =>
 }
 
 /*
+    Gets a list of the most volatile coins to display on the homepage
+    @Return: List of coins to display
+*/
+async function getHomeCoins()
+{
+    var coins = ['bitcoin', 'ethereum', 'litecoin']
+    var urlStr = 'https://api.coingecko.com/api/v3/search/trending';
+    var resp = await coinAPICall(urlStr);
+    for(var i = 0; i < resp.coins.length; i++)
+    {
+        coins.push(resp.coins[i].item.id);
+    }
+    return coins;
+
+}
+
+/*
     Initialize all boxes on the home page with data
     @Param coinList: List of coin IDS to get data for
 */
 async function initCoins(coinList, cssClass)
 {
     //TODO: Populate dictionary with coins to showcase
+    if(coinList == '')
+    {
+        coinList = await getHomeCoins();
+    }
 
     //Put all elements in the array into 1 string with the below substring between them
     var urlStr = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=' + coinList.join('%2C%20') + 
         '&order=market_cap_desc&per_page=100&page=1&sparkline=true&price_change_percentage=1h%2C24h%2C7d%2C14d%2C30d%2C1y';
         
-    console.log(urlStr);
 
     resp = await coinAPICall(urlStr);
+
     for (var i = 0; i < resp.length; i++)
     {
+        console.log(resp[i]);
         //Display data for every coin and set an interval for them
         coinDiv = await setHomeCoin(resp[i]);
         coinDiv.classList.add(cssClass);
@@ -155,7 +193,21 @@ async function refreshCoinData(url)
         var coinMarketData = coinJSON['sparkline_in_7d']['price'];
         chart = chartDiv.getElementsByClassName('chart')[0];
         const newCoinPrice = coinJSON['current_price'];
-        const newCoinChange = coinJSON['price_change_percentage_7d'].toFixed(2);
+        var coinStatus;
+        if (data['price_change_percentage_1h_in_currency']!=null)
+            coinStatus =  data['price_change_percentage_1h_in_currency'].toFixed(2);
+        else if (data['price_change_percentage_24h_in_currency']!=null)
+            coinStatus =  data['price_change_percentage_24h_in_currency'].toFixed(2);
+        else if (data['price_change_percentage_7d_in_currency']!=null)
+            coinStatus =  data['price_change_percentage_7d_in_currency'].toFixed(2);
+        else if (data['price_change_percentage_14d_in_currency']!=null)
+            coinStatus =  data['price_change_percentage_14d_in_currency'].toFixed(2);
+        else if (data['price_change_percentage_30d_in_currency']!=null)
+            coinStatus =  data['price_change_percentage_30d_in_currency'].toFixed(2);
+        else if (data['price_change_percentage_1y_in_currency']!=null)
+            coinStatus =  data['price_change_percentage_1y_in_currency'].toFixed(2);
+        else
+            coinStatus = 'No change data';
         boxPrice.innerHTML = newCoinPrice;
 
         console.log(chartDiv);
@@ -420,7 +472,8 @@ async function displayAllCoins()
 {
     await getCoins();
     allCoinList = allCoinList.filter(e => !e.includes('-'));
-    var urlStr = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=' + allCoinList.slice(0, 50).join('%2C%20') + '&order=market_cap_desc&per_page=250&page=1&sparkline=false';
+    var urlStr = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=' + allCoinList.slice(0,50).join('%2C%20') + '&order=market_cap_desc&per_page=250&page=1&sparkline=false';
+    console.log(allCoinList.slice(0, 50).join(', '));
     resp = await coinAPICall(urlStr);
     var table = document.createElement('table');
     table.style.width = "100%";
@@ -432,12 +485,16 @@ async function displayAllCoins()
         var td1 = document.createElement('td');
         td1.appendChild(document.createTextNode(resp[i].name));
         var td2 = document.createElement('td');
-        td2.appendChild(document.createTextNode(resp[i].current_price));
+        var img = document.createElement('img');
+        img.src = resp[i].image;
+        img.classList.add('coin-img');
+        td2.appendChild(img);
         tr.appendChild(td1);
         tr.appendChild(td2);
-        tbdy.appendChild(tr);
+       tbdy.appendChild(tr);
 
     }
     table.appendChild(tbdy);
     document.getElementById('coin-container').appendChild(table);
+
 }
