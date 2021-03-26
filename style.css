@@ -43,8 +43,8 @@ div.coin-box {
 }
 
 div.coin-box-single {
-  border: 1px solid var(--secondary-color);
-  border-radius: 25px;
+  /* border: 1px solid var(--secondary-color); */
+  /* border-radius: 25px; */
   width: 26%;
   min-width: 600px;
   max-width: 600px;
@@ -56,9 +56,31 @@ div.coin-box-single {
   margin-left: auto;
   margin-right: auto;
   text-align: center;
-  background-color: var(--primary-color);
+  /* background-color: var(--primary-color); */
   color: var(--secondary-color);
+}
 
+div.coin-desc-single {
+  /* border: 1px solid var(--secondary-color); */
+  border-radius: 25px;
+  flex-grow: 1;
+  margin: 10px;
+  padding: 10px;
+
+  min-width: 800px;
+  width: 600px;
+  min-height: 600px;
+  /* background-color: var(--primary-color); */
+  color: var(--secondary-color);
+}
+
+th.price-table-single {
+  width: 10%;
+  margin: 10px;
+  padding: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
 }
 
 div.coins-container {

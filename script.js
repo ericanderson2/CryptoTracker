@@ -41,8 +41,7 @@ const setHomeCoin = async (data) =>
     coinPrice = data['current_price'];
     coinIMG = data['image'];
     coinTicker = data['symbol'].toUpperCase();
-    coinStatus = data['price_change_percentage_24h'].toFixed(2);
-
+    coinStatus = data['price_change_percentage_7d_in_currency'].toFixed(2);
     coinMarketData = data['sparkline_in_7d']['price'];
     
     //Create container div for the coin
@@ -64,7 +63,7 @@ const setHomeCoin = async (data) =>
     divStar = document.createElement('button');
     divStar.classList.add('iconify');
     divStar.setAttribute('data-icon', "dashicons:star-empty");
-    divStar.addEventListener("click", "addCookie()");
+    divStar.addEventListener("click", addCookie());
     divStar.setAttribute('data-inline', "false");
     //Percent change text
     divChange= document.createElement('p');
@@ -103,9 +102,7 @@ const setHomeCoin = async (data) =>
         makeChart(coinMarketData, currChart, 'green');
     }
     
-    return coinDiv;
-    
-
+    return coinDiv; 
 }
 
 /*
@@ -117,7 +114,9 @@ async function initCoins(coinList, cssClass)
     //TODO: Populate dictionary with coins to showcase
 
     //Put all elements in the array into 1 string with the below substring between them
-    var urlStr = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=' + coinList.join('%2C%20') + '&order=market_cap_desc&per_page=100&page=1&sparkline=true';
+    var urlStr = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=' + coinList.join('%2C%20') + 
+        '&order=market_cap_desc&per_page=100&page=1&sparkline=true&price_change_percentage=1h%2C24h%2C7d%2C14d%2C30d%2C1y';
+        
     console.log(urlStr);
 
     resp = await coinAPICall(urlStr);
@@ -181,6 +180,161 @@ async function refreshCoinData(url)
 }
 
 /*
+    Displays the coin on the single coin page
+    @Param data: JSON data of the current coin
+*/
+const setSingleCoin = async (data) =>
+{
+     //Get coin ID
+     coinID = data['id'];
+     //Get coin name
+     coinName = data['name'];
+     //Get the current price, image, ticker, and percent change from the coin's JSON data
+     coinPrice = data['current_price'];
+     coinIMG = data['image'];
+     coinTicker = data['symbol'].toUpperCase();
+
+    coinStatus = {}
+    coinStatus['1h'] =  data['price_change_percentage_1h_in_currency'].toFixed(2);
+    coinStatus['24h'] =  data['price_change_percentage_24h_in_currency'].toFixed(2);
+    coinStatus['7d'] =  data['price_change_percentage_7d_in_currency'].toFixed(2);
+    coinStatus['14d'] =  data['price_change_percentage_14d_in_currency'].toFixed(2);
+    coinStatus['30d'] =  data['price_change_percentage_30d_in_currency'].toFixed(2);
+    coinStatus['1y'] =  data['price_change_percentage_1y_in_currency'].toFixed(2);
+
+     coinMarketData = data['sparkline_in_7d']['price'];
+     
+     //Create container div for the coin
+     const coinDiv = document.createElement('div');
+ 
+     //Populate div with elements
+     //Coin image
+     divImg = document.createElement('img');
+     divImg.src = coinIMG;
+     divImg.classList.add('coin-img');
+     //Header with coin name, ticker, and a link to the separate page
+     divName = document.createElement('h1');
+     divName.innerHTML = '<a class="coin-header" href="coin.html?id=' + coinID + '">' + coinName + ' (' + coinTicker + ')' + '</a>';
+     //Price text
+     divPrice = document.createElement('p');
+     divPrice.innerHTML = coinPrice;
+     divPrice.classList.add('Prices');
+     //Favorite star
+     divStar = document.createElement('button');
+     divStar.classList.add('iconify');
+     divStar.setAttribute('data-icon', "dashicons:star-empty");
+     divStar.addEventListener("click", addCookie());
+     divStar.setAttribute('data-inline', "false");
+     //Percent change text
+     divChange = document.createElement('p');
+     divChange.classList.add('Changes');
+     //Add elements to parent div
+     coinDiv.appendChild(divImg);
+     coinDiv.appendChild(divName);
+     coinDiv.appendChild(divPrice);
+     coinDiv.appendChild(divChange);
+     coinDiv.appendChild(divStar);
+     //Create a div and canvas element for the graphs
+     chartDiv = document.createElement('div');
+     currChart = document.createElement('canvas');
+     currChart.classList.add('chart');
+     currChart.style.width = "300px";
+     currChart.style.height = "200px";
+     chartDiv.appendChild(currChart);
+     coinDiv.appendChild(chartDiv);
+
+     
+     const table  = document.createElement('table');
+     const tableLabels = document.createElement('tr');
+     for (var key in coinStatus)
+     {  
+        divStatus = document.createElement('th');
+        divStatus.classList.add('price-table-single');
+        divStatus.innerHTML = key;
+        tableLabels.appendChild(divStatus);
+     }
+     table.appendChild(tableLabels);
+
+     const tableData = document.createElement('tr');
+     for (var key in coinStatus)
+     {  
+        divStatus = document.createElement('th');
+        divStatus.classList.add('price-table-single');
+        tableData.appendChild(divStatus);
+
+        if(coinStatus[key].charAt(0) == '-')
+        {
+            divStatus.style.color = 'red'  
+            divStatus.innerHTML = coinStatus[key];
+        }
+        else
+        {
+            divStatus.style.color = 'green'  
+            divStatus.innerHTML = '+' + coinStatus[key];
+        }
+     }
+     table.appendChild(tableData);
+     coinDiv.appendChild(table);
+
+     document.getElementById('coin-container').appendChild(coinDiv);
+ 
+     if(coinStatus['7d'].charAt(0) == '-')
+     {
+         //color red if lost value
+         divChange.style.color = 'red';
+         divChange.innerHTML = coinStatus['7d'] + '%';
+         makeChart(coinMarketData, currChart, 'red');
+     }
+     else
+     {
+         //color green if gained value
+         divChange.style.color = 'green';
+         divChange.innerHTML = '+' + coinStatus['7d'] + '%';
+         makeChart(coinMarketData, currChart, 'green');
+     }
+     return coinDiv;
+}
+
+/*
+    Displays more coin info the single coin page
+    @Param data: JSON data of the current coin
+*/
+async function setSingleDesc(data){
+    coinDesc = data['description']['en'];
+    const divDesc = document.createElement('div');
+    desc = document.createElement('h4');
+    desc.innerHTML = coinDesc;
+    divDesc.classList.add('price-table-single');
+    divDesc.appendChild(desc);
+    document.getElementById('coin-description').appendChild(divDesc);
+    
+    return divDesc;
+}
+
+/*
+    Initialize coin on the single coin page
+*/
+async function initSingleCoin()
+{
+    var url = window.location.href;
+    var id = [url.substring(url.indexOf("?id=") + 4)];
+
+    var urlStr1 = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=' + id + 
+        '&order=market_cap_desc&per_page=100&page=1&sparkline=true&price_change_percentage=1h%2C24h%2C7d%2C14d%2C30d%2C1y';
+        
+    var urlStr2 = 'https://api.coingecko.com/api/v3/coins/' + id + '?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false';
+
+    // console.log(urlStr);
+    resp = await coinAPICall(urlStr1);
+    coinDiv = await setSingleCoin(resp[0]);
+    coinDiv.classList.add('coin-box-single');
+
+    resp2 = await coinAPICall(urlStr2);
+    coinDiv = await setSingleDesc(resp2);
+    coinDiv.classList.add('coin-desc-single');
+}
+
+/*
     gathers historical data and calls chart() to graph recent 24 vol and prices.
     @Param coin: Coin ID to get graph for
     @Param chart: Chart to create/update
@@ -189,9 +343,8 @@ async function refreshCoinData(url)
 const makeChart = async (coinData, chart, color) =>
 {
     labels = [];
-    for (var i = 0; i < 125; i++){
+    for (var i = 0; i < coinData.length; i++)
         labels[i] = '';
-    }
     
     new Chart(chart, {
         type: 'line',
@@ -201,6 +354,7 @@ const makeChart = async (coinData, chart, color) =>
                 data: coinData,
                 label: "price",
                 borderColor: color,
+                pointRadius: 0,
                 pointBorderColor: 'none',
                 fill: false
             }]
@@ -209,12 +363,6 @@ const makeChart = async (coinData, chart, color) =>
     });
 }
 
-function initSingleCoin()
-{
-    var url = window.location.href;
-    var ids = [url.substring(url.indexOf("?id=") + 4)];
-    initCoins(ids, 'coin-box-single');
-}
 function addCookie(coin)
 {
   if (coin == undefined) {
