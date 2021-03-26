@@ -36,29 +36,22 @@ const setHomeCoin = async (data) =>
 {
     //Get coin ID
     coinID = data['id'];
-    console.log(coinID);
     //Get coin name
     coinName = data['name'];
     //Get the current price, image, ticker, and percent change from the coin's JSON data
     coinPrice = data['current_price'];
     coinIMG = data['image'];
     coinTicker = data['symbol'].toUpperCase();
-    //If a price for the 7d is null, calculate it manually
-    if (data['price_change_percentage_1h_in_currency']!=null)
-        coinStatus =  data['price_change_percentage_1h_in_currency'].toFixed(2);
-    else if (data['price_change_percentage_24h_in_currency']!=null)
-        coinStatus =  data['price_change_percentage_24h_in_currency'].toFixed(2);
-    else if (data['price_change_percentage_7d_in_currency']!=null)
-        coinStatus =  data['price_change_percentage_7d_in_currency'].toFixed(2);
-    else if (data['price_change_percentage_14d_in_currency']!=null)
-        coinStatus =  data['price_change_percentage_14d_in_currency'].toFixed(2);
-    else if (data['price_change_percentage_30d_in_currency']!=null)
-        coinStatus =  data['price_change_percentage_30d_in_currency'].toFixed(2);
-    else if (data['price_change_percentage_1y_in_currency']!=null)
-        coinStatus =  data['price_change_percentage_1y_in_currency'].toFixed(2);
-    else
-        coinStatus = 'No change data'
     coinMarketData = data['sparkline_in_7d']['price'];
+    coinStatus =  data['price_change_percentage_7d_in_currency'];
+    //If there is no 7 day price change, calculate it using the sparkline data
+    if(coinStatus == null)
+    {
+        //Get opening price for the week
+        initSevenDayPrice = coinMarketData[0];
+        coinStatus = (coinPrice - initSevenDayPrice) / initSevenDayPrice;
+    }
+    coinStatus = coinStatus.toFixed(2);
     
     //Create container div for the coin
     const coinDiv = document.createElement('div');
@@ -79,7 +72,7 @@ const setHomeCoin = async (data) =>
     divStar = document.createElement('button');
     divStar.classList.add('iconify');
     divStar.setAttribute('data-icon', "dashicons:star-empty");
-    divStar.addEventListener("click", addCookie());
+    divStar.addEventListener("click", addCookie);
     divStar.setAttribute('data-inline', "false");
     //Percent change text
     divChange= document.createElement('p');
@@ -159,7 +152,6 @@ async function initCoins(coinList, cssClass)
 
     for (var i = 0; i < resp.length; i++)
     {
-        console.log(resp[i]);
         //Display data for every coin and set an interval for them
         coinDiv = await setHomeCoin(resp[i]);
         coinDiv.classList.add(cssClass);
@@ -184,7 +176,6 @@ async function refreshCoinData(url)
         //Get data that needs to update: price, %change, and the graph
         const currBox = boxes[i];
         const boxChildren = currBox.childNodes;
-        console.log(boxChildren);
         const coinName = boxChildren[1].innerHTML.match(/(?<=id=\s*).*?(?=\s*">)/gs);
         const boxPrice = boxChildren[2];
         const boxChange = boxChildren[3];
@@ -194,23 +185,16 @@ async function refreshCoinData(url)
         chart = chartDiv.getElementsByClassName('chart')[0];
         const newCoinPrice = coinJSON['current_price'];
         var newCoinChange;
-        if (coinJSON['price_change_percentage_1h_in_currency']!=null)
-            newCoinChange =  coinJSON['price_change_percentage_1h_in_currency'].toFixed(2);
-        else if (coinJSON['price_change_percentage_24h_in_currency']!=null)
-            newCoinChange =  coinJSON['price_change_percentage_24h_in_currency'].toFixed(2);
-        else if (coinJSON['price_change_percentage_7d_in_currency']!=null)
-            newCoinChange =  coinJSON['price_change_percentage_7d_in_currency'].toFixed(2);
-        else if (coinJSON['price_change_percentage_14d_in_currency']!=null)
-            newCoinChange =  coinJSON['price_change_percentage_14d_in_currency'].toFixed(2);
-        else if (coinJSON['price_change_percentage_30d_in_currency']!=null)
-            newCoinChange =  coinJSON['price_change_percentage_30d_in_currency'].toFixed(2);
-        else if (coinJSON['price_change_percentage_1y_in_currency']!=null)
-            newCoinChange =  coinJSON['price_change_percentage_1y_in_currency'].toFixed(2);
-        else
-            newCoinChange = 'No change data';
+        newCoinChange =  coinJSON['price_change_percentage_7d_in_currency'];
+        //If there is no 7 day price change, calculate it using the sparkline data
+        if(newCoinChange == null)
+        {
+            //Get opening price for the week
+            initSevenDayPrice = coinMarketData[0];
+            newCoinChange = (coinPrice - initSevenDayPrice) / initSevenDayPrice;
+        }
+        newCoinChange = newCoinChange.toFixed(2);
         boxPrice.innerHTML = newCoinPrice;
-
-        console.log(chartDiv);
 
         if(newCoinChange.charAt(0) == '-')
         {
