@@ -155,7 +155,7 @@ async function refreshCoinData(url)
         var coinMarketData = coinJSON['sparkline_in_7d']['price'];
         chart = chartDiv.getElementsByClassName('chart')[0];
         const newCoinPrice = coinJSON['current_price'];
-        const newCoinChange = coinJSON['price_change_percentage_24h'].toFixed(2);
+        const newCoinChange = coinJSON['price_change_percentage_7d'].toFixed(2);
         boxPrice.innerHTML = newCoinPrice;
 
         console.log(chartDiv);
