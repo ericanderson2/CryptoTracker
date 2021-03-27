@@ -73,7 +73,7 @@ const setHomeCoin = async (data) =>
     divStar = document.createElement('button');
     divStar.classList.add('fav-button');
     divStar.value = coinID;
-    divStar.onclick = function(){addCookie(this.value);};
+    divStar.onclick = function(){checkCookie(this.value);};
     //Percent change text
     divChange= document.createElement('p');
     divChange.classList.add('Changes');
@@ -274,10 +274,9 @@ const setSingleCoin = async (data, moreData) =>
      divPrice.classList.add('Prices');
      //Favorite star
      divStar = document.createElement('button');
-     divStar.classList.add('iconify');
-     divStar.setAttribute('data-icon', "dashicons:star-empty");
-     divStar.addEventListener("click", addCookie());
-     divStar.setAttribute('data-inline', "false");
+     divStar.classList.add('fav-button');
+     divStar.value = coinID;
+     divStar.onclick = function(){checkCookie(this.value);};
      //Percent change text
      divChange = document.createElement('p');
      divChange.classList.add('Changes');
@@ -402,27 +401,33 @@ const makeChart = async (coinData, chart, color) =>
     });
 }
 
+function checkCookie(coin)
+{
+    var cookie = getCookie(coin);
+    if(cookie == "")
+    {
+        addCookie(coin);
+    }
+    else
+    {
+        deleteCookie(cookie);
+    }
+}
+
 function addCookie(coin)
 {
-    var cookieNum = 1;
-    for (let i = 1; i < 10; i++) {
-      if (getCookie(i) == "") {
-        cookieNum = i;
-        break;
-      }
-    }
+    var cookieNum = document.cookie.length + 1;
 
     let date = new Date(Date.now() + 86400e3);
     date = date.toUTCString();
-    console.log(date)
     //Need to set expiration date for cookies or they're only for the current page load
-    var cookieStr = cookieNum + '=' + coin + "; expires=" + date + "; SameSite=Strict" + "; path=/";
+    var cookieStr = cookieNum + '=' + coin + "; expires=" + date + "; SameSite=Strict; path=/;";
     document.cookie = cookieStr;
 }
 
 function loadCookies()
 {
-    if(getCookie(1) == "")
+    if(document.cookie == "")
     {
         noPins = document.createElement('h1');
         noPins.innerHTML = "You haven't favorited any coins yet.";
@@ -433,42 +438,33 @@ function loadCookies()
     else
     {
         var pinnedCoins = [];
-        for (let i = 1; i < 10; i++) {
-          if (getCookie(i) == "") {
-            break;
-          }
-          pinnedCoins.push(getCookie(i));
+        var decodedCookie = decodeURIComponent(document.cookie);
+        var ca = decodedCookie.split(';');
+        for (let i = 0; i < ca.length; i++) 
+        {
+            c = ca[i].split('=');
+            pinnedCoins.push(c[1]);
         }
-        initCoins(pinnedCoins);
+        initCoins(pinnedCoins, 'coin-box');
     }
 }
 
-function addPin() {
-  var id = document.getElementById("pin_input").value;
-  addCookie(id);
-  window.location.reload(true);
-}
-
-/* for debugging */
-function deleteCookies() {
-  for (let i = 1; i < 10; i++) {
-    document.cookie = i + "=; expires = Thu, 01 Jan 1970 00:00:00 UTC";
-  }
-  window.location.reload(true);
+function deleteCookie(cookie)
+{
+    cookieStr = cookie +  "; expires=Thu, 01 Jan 1970 00:00:00 UTC; ; SameSite=Strict; path=/;";
+    document.cookie = cookieStr;
 }
 
 function getCookie(cname) {
-  var name = cname + "=";
-  var decodedCookie = decodeURIComponent(document.cookie);
-  var ca = decodedCookie.split(';');
-  for(var i = 0; i <ca.length; i++) {
-    var c = ca[i];
-    while (c.charAt(0) == ' ') {
-      c = c.substring(1);
+    var decodedCookie = decodeURIComponent(document.cookie);
+    var ca = decodedCookie.split(';');
+    for (var i=0; i < ca.length; i++) 
+    {
+        c = ca[i].split('=');
+        if (c[1] == cname) 
+        {
+            return c.join('=');
+        }
     }
-    if (c.indexOf(name) == 0) {
-      return c.substring(name.length, c.length);
-    }
-  }
-  return "";
+    return "";
 }
