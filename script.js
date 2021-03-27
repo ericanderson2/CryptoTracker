@@ -232,12 +232,22 @@ const setSingleCoin = async (data, moreData) =>
      coinIMG = data['image'];
      coinTicker = data['symbol'].toUpperCase();
 
-    coinMc = data['market_cap'];        // could be 0
-    coinMcRank = data['market_cap_rank'];   // could be null
-    coinTotalVol = data['total_volume'];
-    coinHigh = data['high_24h'];
-    coinLow = data['low_24h'];
+     coinMc = data['market_cap'];        // could be 0
+     coinMcRank = data['market_cap_rank'];   // could be null
+     coinTotalVol = data['total_volume'];
+     coinHigh = data['high_24h'];
+     coinLow = data['low_24h'];
+     coinMaxSupply = data['max_supply'];
+     coinCurSupply = data['circulating_supply'];
 
+     coinAth = data['ath'];
+     coinAthChange = data['ath_change_percentage'];
+     coinAthDate = data['ath_date'];
+     coinAtl = data['atl'];
+     coinAtlChange = data['atl_change_percentage'];
+     coinAtlDate = data['atl_date'];
+
+    
     coinStatus = {}
     if (data['price_change_percentage_1h_in_currency']!=null)
         coinStatus['1h'] =  data['price_change_percentage_1h_in_currency'].toFixed(2);
@@ -334,6 +344,181 @@ const setSingleCoin = async (data, moreData) =>
         coinDiv.appendChild(divDesc);
     }
 
+    
+    const table2  = document.createElement('table');
+    const tableEntry1 = document.createElement('tr');
+
+    if (coinMc!=0){
+        divRank = document.createElement('th');
+        divRank.classList.add('price-table-single');
+        divRank.innerHTML = 'Market Cap';
+        tableEntry1.appendChild(divRank);
+
+        divRank = document.createElement('th');
+        divRank.classList.add('price-table-single');
+        divRank.innerHTML = coinMc;
+        tableEntry1.appendChild(divRank);
+    }
+    
+    const tableEntry2 = document.createElement('tr');
+    if (coinMcRank!=null){
+        divMcRank = document.createElement('th');
+        divMcRank.classList.add('price-table-single');
+        divMcRank.innerHTML = 'Market Cap Rank';
+        tableEntry2.appendChild(divMcRank);
+
+        divMcRank = document.createElement('th');
+        divMcRank.classList.add('price-table-single');
+        divMcRank.innerHTML = coinMcRank;
+        tableEntry2.appendChild(divMcRank);
+    }
+
+    const tableEntry3 = document.createElement('tr');
+    if (coinTotalVol!=null){
+        divVol = document.createElement('th');
+        divVol.classList.add('price-table-single');
+        divVol.innerHTML = 'Total Volume';
+        tableEntry3.appendChild(divVol);
+
+        divVol = document.createElement('th');
+        divVol.classList.add('price-table-single');
+        divVol.innerHTML = coinTotalVol;
+        tableEntry3.appendChild(divVol);
+    }
+
+    const tableEntry4 = document.createElement('tr');
+    if (coinHigh!=null){
+        divHigh = document.createElement('th');
+        divHigh.classList.add('price-table-single');
+        divHigh.innerHTML = '24h High';
+        tableEntry4.appendChild(divHigh);
+
+        divHigh = document.createElement('th');
+        divHigh.innerHTML = coinHigh;
+        tableEntry4.appendChild(divHigh);
+    }
+
+    const tableEntry5 = document.createElement('tr');
+    if (coinLow!=null){
+        divLow = document.createElement('th');
+        divLow.classList.add('price-table-single');
+        divLow.innerHTML = '24h Low';
+        tableEntry5.appendChild(divLow);
+
+        divLow = document.createElement('th');
+        divLow.innerHTML = coinLow;
+        tableEntry5.appendChild(divLow);
+    }
+
+    const tableEntry6 = document.createElement('tr');
+    if (coinMaxSupply!=null){
+        divMaxSupply = document.createElement('th');
+        divMaxSupply.classList.add('price-table-single');
+        divMaxSupply.innerHTML = 'Max Token Supply';
+        tableEntry6.appendChild(divMaxSupply);
+
+        divMaxSupply = document.createElement('th');
+        divMaxSupply.innerHTML = coinMaxSupply;
+        tableEntry6.appendChild(divMaxSupply);
+    }
+
+    const tableEntry7 = document.createElement('tr');
+    if (coinCurSupply!=0){
+        divCurSupply = document.createElement('th');
+        divCurSupply.classList.add('price-table-single');
+        divCurSupply.innerHTML = 'Circulating Token Supply';
+        tableEntry7.appendChild(divCurSupply);
+
+        divCurSupply = document.createElement('th');
+        divCurSupply.innerHTML = coinCurSupply;
+        tableEntry7.appendChild(divCurSupply);
+    }
+
+    const tableEntry8 = document.createElement('tr');
+    if (coinAth!=0){
+        divAth = document.createElement('th');
+        divAth.classList.add('price-table-single');
+        divAth.innerHTML = 'All Time High';
+        tableEntry8.appendChild(divAth);
+
+        divAth = document.createElement('th');
+        divAth.innerHTML = coinAth;
+        tableEntry8.appendChild(divAth);
+    }
+
+    const tableEntry9 = document.createElement('tr');
+    if (coinAthChange!=0){
+        divAthChange = document.createElement('th');
+        divAthChange.classList.add('price-table-single');
+        divAthChange.innerHTML = 'All Time High Change';
+        tableEntry9.appendChild(divAthChange);
+
+        divAthChange = document.createElement('th');
+        divAthChange.innerHTML = coinAthChange + '%';
+        tableEntry9.appendChild(divAthChange);
+    }
+
+    const tableEntry10 = document.createElement('tr');
+    if (coinAthDate!=null){
+        divAthDate = document.createElement('th');
+        divAthDate.classList.add('price-table-single');
+        divAthDate.innerHTML = 'All Time High Date';
+        tableEntry10.appendChild(divAthDate);
+
+        divAthDate = document.createElement('th');
+        divAthDate.innerHTML = coinAthDate.substring(0,10);
+        tableEntry10.appendChild(divAthDate);
+    }
+
+    const tableEntry11 = document.createElement('tr');
+    if (coinAtl!=0){
+        divAtl = document.createElement('th');
+        divAtl.classList.add('price-table-single');
+        divAtl.innerHTML = 'All Time Low';
+        tableEntry11.appendChild(divAtl);
+
+        divAtl = document.createElement('th');
+        divAtl.innerHTML = coinAtl;
+        tableEntry11.appendChild(divAtl);
+    }
+    const tableEntry12 = document.createElement('tr');
+    if (coinAtlChange!=0){
+        divAtlChange = document.createElement('th');
+        divAtlChange.classList.add('price-table-single');
+        divAtlChange.innerHTML = 'All Time Low Change';
+        tableEntry12.appendChild(divAtlChange);
+
+        divAtlChange = document.createElement('th');
+        divAtlChange.innerHTML = coinAtlChange + '%';
+        tableEntry12.appendChild(divAtlChange);
+    }
+
+    const tableEntry13 = document.createElement('tr');
+    if (coinAtlDate!=null){
+        divAtlDate = document.createElement('th');
+        divAtlDate.classList.add('price-table-single');
+        divAtlDate.innerHTML = 'All Time Low Date';
+        tableEntry13.appendChild(divAtlDate);
+
+        divAtlDate = document.createElement('th');
+        divAtlDate.innerHTML = coinAtlDate.substring(0,10);
+        tableEntry13.appendChild(divAtlDate);
+    }
+    table2.appendChild(tableEntry1);
+    table2.appendChild(tableEntry2);
+    table2.appendChild(tableEntry3);
+    table2.appendChild(tableEntry4);
+    table2.appendChild(tableEntry5);
+    table2.appendChild(tableEntry6);
+    table2.appendChild(tableEntry7);
+    table2.appendChild(tableEntry8);
+    table2.appendChild(tableEntry9);
+    table2.appendChild(tableEntry10);
+    table2.appendChild(tableEntry11);
+    table2.appendChild(tableEntry12);
+    table2.appendChild(tableEntry13);
+    coinDiv.appendChild(table2);
+    
      document.getElementById('coin-container').appendChild(coinDiv);
 
      if(coinStatus['7d'].charAt(0) == '-')
