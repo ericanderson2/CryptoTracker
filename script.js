@@ -247,7 +247,7 @@ const setSingleCoin = async (data, moreData) =>
      coinAtlChange = data['atl_change_percentage'];
      coinAtlDate = data['atl_date'];
 
-    
+
     coinStatus = {}
     if (data['price_change_percentage_1h_in_currency']!=null)
         coinStatus['1h'] =  data['price_change_percentage_1h_in_currency'].toFixed(2);
@@ -344,7 +344,7 @@ const setSingleCoin = async (data, moreData) =>
         coinDiv.appendChild(divDesc);
     }
 
-    
+
     const table2  = document.createElement('table');
     const tableEntry1 = document.createElement('tr');
 
@@ -359,7 +359,7 @@ const setSingleCoin = async (data, moreData) =>
         divRank.innerHTML = coinMc;
         tableEntry1.appendChild(divRank);
     }
-    
+
     const tableEntry2 = document.createElement('tr');
     if (coinMcRank!=null){
         divMcRank = document.createElement('th');
@@ -518,7 +518,7 @@ const setSingleCoin = async (data, moreData) =>
     table2.appendChild(tableEntry12);
     table2.appendChild(tableEntry13);
     coinDiv.appendChild(table2);
-    
+
      document.getElementById('coin-container').appendChild(coinDiv);
 
      if(coinStatus['7d'].charAt(0) == '-')
@@ -625,7 +625,7 @@ function loadCookies()
         var pinnedCoins = [];
         var decodedCookie = decodeURIComponent(document.cookie);
         var ca = decodedCookie.split(';');
-        for (let i = 0; i < ca.length; i++) 
+        for (let i = 0; i < ca.length; i++)
         {
             c = ca[i].split('=');
             pinnedCoins.push(c[1]);
@@ -638,18 +638,32 @@ function deleteCookie(cookie)
 {
     cookieStr = cookie +  "; expires=Thu, 01 Jan 1970 00:00:00 UTC; ; SameSite=Strict; path=/;";
     document.cookie = cookieStr;
+
+    /*we have to update the cookies somehow after they are deleted
+      this is the easiest but doesn't look great */
+    if (window.location.pathname == "/pins.html") {
+      window.location.reload();
+    }
 }
 
 function getCookie(cname) {
     var decodedCookie = decodeURIComponent(document.cookie);
     var ca = decodedCookie.split(';');
-    for (var i=0; i < ca.length; i++) 
+    for (var i=0; i < ca.length; i++)
     {
         c = ca[i].split('=');
-        if (c[1] == cname) 
+        if (c[1] == cname)
         {
             return c.join('=');
         }
     }
     return "";
+}
+
+/* A different function from addCookie is necessary because if you add
+  a pin from the pins screen the cookies need to be updated */
+function addPin() {
+  var id = document.getElementById("pin_input").value;
+  addCookie(id);
+  window.location.reload();
 }
