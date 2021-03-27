@@ -52,7 +52,7 @@ const setHomeCoin = async (data) =>
         coinStatus = (coinPrice - initSevenDayPrice) / initSevenDayPrice;
     }
     coinStatus = coinStatus.toFixed(2);
-    
+
     //Create container div for the coin
     const coinDiv = document.createElement('div');
     coinDiv.classList.add('coin-box-div');
@@ -73,7 +73,7 @@ const setHomeCoin = async (data) =>
     divStar = document.createElement('button');
     divStar.classList.add('fav-button');
     divStar.value = coinID;
-    divStar.onclick = function(){addCookie(this);};
+    divStar.onclick = function(){addCookie(this.value);};
     //Percent change text
     divChange= document.createElement('p');
     divChange.classList.add('Changes');
@@ -113,8 +113,8 @@ const setHomeCoin = async (data) =>
         divChange.innerHTML = '+' + coinStatus + '%';
         makeChart(coinMarketData, currChart, 'green');
     }
-    
-    return coinDiv; 
+
+    return coinDiv;
 }
 
 /*
@@ -147,9 +147,9 @@ async function initCoins(coinList, cssClass)
     }
 
     //Put all elements in the array into 1 string with the below substring between them
-    var urlStr = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=' + coinList.join('%2C%20') + 
+    var urlStr = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=' + coinList.join('%2C%20') +
         '&order=market_cap_desc&per_page=100&page=1&sparkline=true&price_change_percentage=1h%2C24h%2C7d%2C14d%2C30d%2C1y';
-        
+
 
     resp = await coinAPICall(urlStr);
 
@@ -213,7 +213,7 @@ async function refreshCoinData(url)
             boxChange.style.color = 'green';
             boxChange.innerHTML = '+' + newCoinChange + '%';
             makeChart(coinMarketData, chart, 'green');
-        } 
+        }
     }
 }
 
@@ -231,7 +231,7 @@ const setSingleCoin = async (data, moreData) =>
      coinPrice = data['current_price'];
      coinIMG = data['image'];
      coinTicker = data['symbol'].toUpperCase();
-    
+
     coinMc = data['market_cap'];        // could be 0
     coinMcRank = data['market_cap_rank'];   // could be null
     coinTotalVol = data['total_volume'];
@@ -256,10 +256,10 @@ const setSingleCoin = async (data, moreData) =>
 
 
     coinMarketData = data['sparkline_in_7d']['price'];
-     
+
      //Create container div for the coin
      const coinDiv = document.createElement('div');
- 
+
      //Populate div with elements
      //Coin image
      divImg = document.createElement('img');
@@ -299,7 +299,7 @@ const setSingleCoin = async (data, moreData) =>
      const table  = document.createElement('table');
      const tableLabels = document.createElement('tr');
      for (var key in coinStatus)
-     {  
+     {
         divStatus = document.createElement('th');
         divStatus.classList.add('price-table-single');
         divStatus.innerHTML = key;
@@ -309,19 +309,19 @@ const setSingleCoin = async (data, moreData) =>
 
      const tableData = document.createElement('tr');
      for (var key in coinStatus)
-     {  
+     {
         divStatus = document.createElement('th');
         divStatus.classList.add('price-table-single');
         tableData.appendChild(divStatus);
 
         if(coinStatus[key].charAt(0) == '-')
         {
-            divStatus.style.color = 'red'  
+            divStatus.style.color = 'red'
             divStatus.innerHTML = coinStatus[key] + '%';
         }
         else
         {
-            divStatus.style.color = 'green'  
+            divStatus.style.color = 'green'
             divStatus.innerHTML = '+' + coinStatus[key] + '%';
         }
      }
@@ -336,7 +336,7 @@ const setSingleCoin = async (data, moreData) =>
     }
 
      document.getElementById('coin-container').appendChild(coinDiv);
- 
+
      if(coinStatus['7d'].charAt(0) == '-')
      {
          //color red if lost value
@@ -361,9 +361,9 @@ async function initSingleCoin()
     var url = window.location.href;
     var id = [url.substring(url.indexOf("?id=") + 4)];
 
-    var urlStr1 = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=' + id + 
+    var urlStr1 = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=' + id +
         '&order=market_cap_desc&per_page=100&page=1&sparkline=true&price_change_percentage=1h%2C24h%2C7d%2C14d%2C30d%2C1y';
-        
+
     var urlStr2 = 'https://api.coingecko.com/api/v3/coins/' + id + '?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false';
 
     resp1 = await coinAPICall(urlStr1);
@@ -384,7 +384,7 @@ const makeChart = async (coinData, chart, color) =>
     labels = [];
     for (var i = 0; i < coinData.length; i++)
         labels[i] = '';
-    
+
     new Chart(chart, {
         type: 'line',
         data: {
@@ -404,27 +404,25 @@ const makeChart = async (coinData, chart, color) =>
 
 function addCookie(coin)
 {
-    coinID = coin.value;
-    var numCookies = document.cookie.split(";").length;
-    if (document.cookie != "") 
-    {
-        numCookies += 1
+    var cookieNum = 1;
+    for (let i = 1; i < 10; i++) {
+      if (getCookie(i) == "") {
+        cookieNum = i;
+        break;
+      }
     }
 
     let date = new Date(Date.now() + 86400e3);
     date = date.toUTCString();
+    console.log(date)
     //Need to set expiration date for cookies or they're only for the current page load
-    cookieStr = numCookies + '=' + coinID + '; expires=' + date + '; path=/; domain=localhost;';
-    console.log(cookieStr);
+    var cookieStr = cookieNum + '=' + coin + "; expires=" + date + "; SameSite=Strict" + "; path=/";
     document.cookie = cookieStr;
-    alert(document.cookie);
 }
 
 function loadCookies()
 {
-    userCoins = document.cookie;
-    console.log(userCoins);
-    if(userCoins.length == 0)
+    if(getCookie(1) == "")
     {
         noPins = document.createElement('h1');
         noPins.innerHTML = "You haven't favorited any coins yet.";
@@ -434,12 +432,12 @@ function loadCookies()
     }
     else
     {
-        var cookies = document.cookie.split(";");
         var pinnedCoins = [];
-
-        for(let i = 1; i <= cookies.length; i++) {
-          var id = cookies[i - 1].split("=")[1];
-          pinnedCoins.push(id);
+        for (let i = 1; i < 10; i++) {
+          if (getCookie(i) == "") {
+            break;
+          }
+          pinnedCoins.push(getCookie(i));
         }
         initCoins(pinnedCoins);
     }
@@ -453,10 +451,24 @@ function addPin() {
 
 /* for debugging */
 function deleteCookies() {
-  var cookies = document.cookie.split(";");
-
-  for(let i = 1; i <= cookies.length; i++) {
-    document.cookie = cookies[i - 1] + ";max-age=0";
+  for (let i = 1; i < 10; i++) {
+    document.cookie = i + "=; expires = Thu, 01 Jan 1970 00:00:00 UTC";
   }
   window.location.reload(true);
+}
+
+function getCookie(cname) {
+  var name = cname + "=";
+  var decodedCookie = decodeURIComponent(document.cookie);
+  var ca = decodedCookie.split(';');
+  for(var i = 0; i <ca.length; i++) {
+    var c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
 }
