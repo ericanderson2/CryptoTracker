@@ -108,7 +108,7 @@ const setHomeCoin = async (data) =>
     currChart.style.height = "300px";
     chartDiv.appendChild(currChart);
     coinDiv.appendChild(chartDiv);
-    
+
 
     //Add the created div to the coin container
     document.getElementById('coin-container').appendChild(coinDiv);
@@ -652,6 +652,9 @@ function loadCookies()
         noPins.classList.add('no-pins');
         noPins.innerHTML = "You haven't favorited any coins yet.";
         document.getElementById('panel').appendChild(noPins);
+        var fillPage = document.createElement('div');
+        fillPage.classList.add('fill-page');
+        document.getElementById('main').appendChild(fillPage);
         numCookies = 0;
         return;
     }
@@ -692,7 +695,7 @@ function deleteCookie(cookie)
     Returns a cookie with a matching name value
     @Param cname: Cookie name to look up
 */
-function getCookie(cname) 
+function getCookie(cname)
 {
     //Decode cookies and split them based on ;
     var decodedCookie = decodeURIComponent(document.cookie);

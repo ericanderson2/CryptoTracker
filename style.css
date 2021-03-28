@@ -263,3 +263,7 @@ div.footer {
   text-decoration: none;
   color: white;
 }
+
+div.fill-page {
+  margin-top: 600px;
+}
