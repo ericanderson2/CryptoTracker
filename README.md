@@ -1,5 +1,13 @@
 # CryptoTracker
 
+Original Developers
+-------------------
+
+ * Stefon Miller - [Stefon Miller](https://github.com/StefonMiller)
+ * Eric Anderson - [ericanderson2](https://github.com/ericanderson2)
+ * Julian Galbraith-Paul - [honest-todd](https://github.com/honest-todd)
+ * Charles Lefevre - [chucklefevre55](https://github.com/chucklefevre55)
+
 Contribute
 ==========
 Any contribution is appreciated. The currently known errors are registered in the Issues tab. Feel free to take a swing at any one of them.
