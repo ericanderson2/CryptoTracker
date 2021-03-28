@@ -19,6 +19,7 @@ div.main {
   display: flex;
   background-color: var(--background-color1);
   background: var(--background-color2);
+  
 }
 
 div.main-panel {
@@ -265,5 +266,5 @@ div.footer {
 }
 
 div.fill-page {
-  margin-top: 600px;
+  height: 100vh;
 }
