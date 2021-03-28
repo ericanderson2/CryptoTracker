@@ -1,6 +1,6 @@
 # CryptoTracker
 
-## There is a-lot of volatility within Cryptocurrencies -- asset's value can jump or fall within hours. While many complicating services exist to give information about coins, none are aimed towards beginners. Our solution is an intuitive website that provides live updates on coins experiencing unusual growth or loss. 
+## There is a-lot of volatility within Cryptocurrencies -- asset's value can jump or fall within hours. While many complicating services exist to display coin data, none are aimed towards beginners. Our solution is an intuitive website that provides live updates on coins experiencing unusual growth or loss. 
 
 # Implementation
 
