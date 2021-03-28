@@ -246,3 +246,20 @@ h1.no-pins
   font-size: 20px;
   color: var(--secondary-color);
 }
+
+div.footer {
+  margin: 0;
+  padding: 20px;
+  background-color: var(--primary-color);
+  border-top: 1px solid var(--secondary-color);
+  text-align: center;
+}
+
+.footer p {
+  color: var(--secondary-color);
+}
+
+.footer a {
+  text-decoration: none;
+  color: white;
+}
