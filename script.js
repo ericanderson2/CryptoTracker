@@ -79,13 +79,16 @@ const setHomeCoin = async (data) =>
     divChange.classList.add('Changes');
     //Add elements to parent div
     const headingDiv = document.createElement('div');
+    const priceRow = document.createElement('div');
     headingDiv.classList.add('box-heading');
+    priceRow.classList.add('box-prices');
     headingDiv.appendChild(divImg);
     headingDiv.appendChild(divName);
     headingDiv.appendChild(divStar);
-    headingDiv.appendChild(divPrice);
-    headingDiv.appendChild(divChange);
+    priceRow.appendChild(divPrice);
+    priceRow.appendChild(divChange);
     coinDiv.appendChild(headingDiv);
+    coinDiv.appendChild(priceRow);
     //Create a div and canvas element for the graphs
     chartDiv = document.createElement('div');
     currChart = document.createElement('canvas');
@@ -180,10 +183,11 @@ async function refreshCoinData(url)
         const currBox = boxes[i];
         const boxChildren = currBox.childNodes;
         const headChildren = boxChildren[0].childNodes;
+        const priceChildren = boxChildren[1].childNodes;
         const coinName = headChildren[1].innerHTML.match(/(?<=id=\s*).*?(?=\s*">)/gs);
-        const boxPrice = headChildren[3];
-        const boxChange = headChildren[4];
-        const chartDiv = boxChildren[1];
+        const boxPrice = priceChildren[0];
+        const boxChange = priceChildren[1];
+        const chartDiv = boxChildren[2];
 
         var coinMarketData = coinJSON['sparkline_in_7d']['price'];
         chart = chartDiv.getElementsByClassName('chart')[0];
