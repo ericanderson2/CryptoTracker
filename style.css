@@ -194,13 +194,33 @@ div.box-heading
   justify-content: center;
   align-items: center;
 }
+
 div.box-prices
 {
+  align-items:center;
 }
 
-button.fav-button
+div.box-prices p
 {
-  width: 20px;
-  height: 20px;
+  font-size: 20px;
+  padding-left: 5%;
+  padding-right:5%;
+  display:inline-block;
+}
 
+img.fav-button
+{
+  width: 30px;
+  height: 30px;
+  float: right;
+  margin-top: 5px;
+  margin-right: 5px;
+}
+
+h1.no-pins
+{
+  color: #9E9E9E;
+	font-family: arial, sans-serif;
+	font-size: 40px;
+  margin:20px;
 }

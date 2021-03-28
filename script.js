@@ -39,7 +39,7 @@ const setHomeCoin = async (data) =>
     //Get coin name
     coinName = data['name'];
     //Get the current price, image, ticker, and percent change from the coin's JSON data
-    coinPrice = data['current_price'];
+    coinPrice = '$' + data['current_price'];
     coinIMG = data['image'];
     coinTicker = data['symbol'].toUpperCase();
     coinMarketData = data['sparkline_in_7d']['price'];
@@ -70,10 +70,21 @@ const setHomeCoin = async (data) =>
     divPrice.innerHTML = coinPrice;
     divPrice.classList.add('Prices');
     //Favorite star
-    divStar = document.createElement('button');
+    divStar = document.createElement('img');
     divStar.classList.add('fav-button');
     divStar.value = coinID;
-    divStar.onclick = function(){checkCookie(this.value);};
+    var cookie = getCookie(coinID);
+    //Set img depending on if it's a cookie
+    if(cookie == "")
+    {
+        divStar.src = 'img/empty-star.png';
+    }
+    else
+    {
+        divStar.src = 'img/filled-star.png';
+    }
+    //Need to pass element to get value and src
+    divStar.onclick = function(){checkCookie(this);};
     //Percent change text
     divChange= document.createElement('p');
     divChange.classList.add('Changes');
@@ -82,9 +93,9 @@ const setHomeCoin = async (data) =>
     const priceRow = document.createElement('div');
     headingDiv.classList.add('box-heading');
     priceRow.classList.add('box-prices');
+    coinDiv.appendChild(divStar);
     headingDiv.appendChild(divImg);
     headingDiv.appendChild(divName);
-    headingDiv.appendChild(divStar);
     priceRow.appendChild(divPrice);
     priceRow.appendChild(divChange);
     coinDiv.appendChild(headingDiv);
@@ -97,7 +108,7 @@ const setHomeCoin = async (data) =>
     currChart.style.height = "300px";
     chartDiv.appendChild(currChart);
     coinDiv.appendChild(chartDiv);
-
+    
 
     //Add the created div to the coin container
     document.getElementById('coin-container').appendChild(coinDiv);
@@ -182,16 +193,15 @@ async function refreshCoinData(url)
         //Get data that needs to update: price, %change, and the graph
         const currBox = boxes[i];
         const boxChildren = currBox.childNodes;
-        const headChildren = boxChildren[0].childNodes;
-        const priceChildren = boxChildren[1].childNodes;
-        const coinName = headChildren[1].innerHTML.match(/(?<=id=\s*).*?(?=\s*">)/gs);
+        const headChildren = boxChildren[1].childNodes;
+        const priceChildren = boxChildren[2].childNodes;
         const boxPrice = priceChildren[0];
         const boxChange = priceChildren[1];
-        const chartDiv = boxChildren[2];
+        const chartDiv = boxChildren[3];
 
         var coinMarketData = coinJSON['sparkline_in_7d']['price'];
         chart = chartDiv.getElementsByClassName('chart')[0];
-        const newCoinPrice = coinJSON['current_price'];
+        const newCoinPrice = '$' + coinJSON['current_price'];
         var newCoinChange;
         newCoinChange =  coinJSON['price_change_percentage_7d_in_currency'];
         //If there is no 7 day price change, calculate it using the sparkline data
@@ -590,23 +600,38 @@ const makeChart = async (coinData, chart, color) =>
     });
 }
 
+/*
+    Checks favorite status of coin and adds/removes it
+    @Param coin: Coin to check
+*/
 function checkCookie(coin)
 {
-    var cookie = getCookie(coin);
+    coinName = coin.value;
+    var cookie = getCookie(coinName);
+    //If no cookie exists, add it. If it exists, remove it
     if(cookie == "")
     {
-        addCookie(coin);
+        coin.src = 'img/filled-star.png';
+        addCookie(coinName);
     }
     else
     {
+        coin.src = 'img/empty-star.png';
         deleteCookie(cookie);
     }
 }
 
+
+/*
+    Adds a cookie to the browser
+    @Param coin: Coin to add
+*/
 function addCookie(coin)
 {
+    //Set the new cookie's index to the current num of cookies + 1
     var cookieNum = document.cookie.length + 1;
 
+    //Cookie expires in 1 day
     let date = new Date(Date.now() + 86400e3);
     date = date.toUTCString();
     //Need to set expiration date for cookies or they're only for the current page load
@@ -614,18 +639,25 @@ function addCookie(coin)
     document.cookie = cookieStr;
 }
 
+/*
+    Loads all cookies whenever the user accesses the pins page
+*/
 function loadCookies()
 {
+    console.log(document.cookie);
+    //If there are no cookies, inform the user
     if(document.cookie == "")
     {
         noPins = document.createElement('h1');
+        noPins.classList.add('no-pins');
         noPins.innerHTML = "You haven't favorited any coins yet.";
-        document.getElementById('main').appendChild(noPins);
+        document.getElementById('panel').appendChild(noPins);
         numCookies = 0;
         return;
     }
     else
     {
+        //Loop through cookies and add them to a list
         var pinnedCoins = [];
         var decodedCookie = decodeURIComponent(document.cookie);
         var ca = decodedCookie.split(';');
@@ -634,12 +666,18 @@ function loadCookies()
             c = ca[i].split('=');
             pinnedCoins.push(c[1]);
         }
+        //Display the coins that are favorited
         initCoins(pinnedCoins, 'coin-box');
     }
 }
 
+/*
+    Deletes a cookie from the browser
+    @Param cookie: Cookie to delete
+*/
 function deleteCookie(cookie)
 {
+    //To delete, set exp date to sometime in the past
     cookieStr = cookie +  "; expires=Thu, 01 Jan 1970 00:00:00 UTC; ; SameSite=Strict; path=/;";
     document.cookie = cookieStr;
 
@@ -650,11 +688,19 @@ function deleteCookie(cookie)
     }
 }
 
-function getCookie(cname) {
+/*
+    Returns a cookie with a matching name value
+    @Param cname: Cookie name to look up
+*/
+function getCookie(cname) 
+{
+    //Decode cookies and split them based on ;
     var decodedCookie = decodeURIComponent(document.cookie);
     var ca = decodedCookie.split(';');
+    //Loop through cookies
     for (var i=0; i < ca.length; i++)
     {
+        //If a name matches, return it
         c = ca[i].split('=');
         if (c[1] == cname)
         {
